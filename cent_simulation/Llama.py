@@ -735,12 +735,12 @@ class TransformerBlockLlama(TransformerBlock):
 
         if self.trace_softmax:
             
-            self.store_for_score_only_trace(self.scores_row_index, self.FC_total_banks, seqlen)
-            self.SYNC_only_trace()
-            self.load_for_score_only_trace(self.scores_row_index, self.FC_total_banks, seqlen)
-            self.SYNC_only_trace()
+        #     self.store_for_score_only_trace(self.scores_row_index, self.FC_total_banks, seqlen)
+        #     self.SYNC_only_trace()
+        #     self.load_for_score_only_trace(self.scores_row_index, self.FC_total_banks, seqlen)
+        #     self.SYNC_only_trace()
 
-        if False:
+        # if False:
             # CXL Port write scale
             rows_per_score = (seqlen - 1) // self.DRAM_column + 1
             self.time["WR_SBK"] += self.timing_constant["WR_SBK"] * rows_per_score + seqlen // self.burst_length

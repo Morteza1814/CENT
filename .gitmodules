@@ -1,0 +1,3 @@
+[submodule "ramulator2"]
+	path = ramulator2
+	url = https://github.com/arkhadem/ramulator2.git

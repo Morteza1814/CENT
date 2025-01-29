@@ -185,7 +185,7 @@ def power_calculator(stat, PCIE_bits, Head, HiddenDim, Tokens, GQA):
     energy["ACT/PRE"] = DRAM_POWER["ACT"] * (stat["ACT"] + 4.00 * stat["ACT4"] + 16.00 * stat["ACT16"]) * tRC / GIGA
     energy["RD"] = DRAM_POWER["RD"] * (stat["RDCP"] + stat["RD"] + stat["RDA"] + 16.00 * stat["AF16"] + stat["RDMAC16"] + stat["RDAF16"]) * tBL / GIGA
     energy["WR"] = DRAM_POWER["WR"] * (stat["WRCP"] + stat["WR"] + stat["WRA"] + stat["WRMAC16"] + 16.00 * stat["WRA16"]) * tBL / GIGA
-    energy["PIM"] = 4 * DRAM_POWER["RD"] * (stat["MAC"] / 16.00 + stat["MAC16"] + stat["EWMUL16"] / 4.00) * tCCDL / GIGA
+    energy["PIM"] = 3 * DRAM_POWER["RD"] * (stat["MAC"] / 16.00 + stat["MAC16"] + stat["EWMUL16"] / 4.00) * tCCDL / GIGA
     energy["ACT_STBY"] = DRAM_POWER["ACT_STBY"] * CH_PER_DV * stat["active_latency"] / KILO
     energy["PRE_STBY"] = DRAM_POWER["PRE_STBY"] * CH_PER_DV * stat["precharged_latency"] / KILO
     energy["DQ"] = DQ_ENERGY * WORD_SIZE * (stat["RD"] + stat["WR"] + stat["RDA"] + stat["WRA"] + stat["WRGB"] + stat["RDMAC16"] + stat["RDAF16"] + stat["WRMAC16"] + stat["WRA16"]) / GIGA

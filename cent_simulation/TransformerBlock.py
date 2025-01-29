@@ -1231,7 +1231,7 @@ class TransformerBlock(PIM):
         num_transformer_blocks_per_device = max(self.num_channels // channels_required_all_devices, 1)
         rows = max(1, (seqlen * self.n_heads - 1) // self.DRAM_column // self.num_banks // channels_required_all_devices + 1)
         columns = (seqlen * self.n_heads - 1) // rows // self.num_banks // channels_required_all_devices + 1
-        print(rows, columns, num_transformer_blocks_per_device)
+        # print(rows, columns, num_transformer_blocks_per_device)
         for row in range(rows):
             for burst in range((columns - 1) // self.burst_length + 1):
                 for bank_index in range(self.num_banks):
