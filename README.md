@@ -13,6 +13,7 @@ This repository provides the following artifact required for the evaluation of t
 
 ## Dependencies
 
+AiM Simulator is tested and verified with `g++-12` and `clang++-15`.
 
 ## Build
 
