@@ -1,4 +1,6 @@
-## PIM is All You Need: A CXL-Enabled GPU-Free System for LLM Inference
+# Artifcat of the CENT Paper, ASPLOS 2025
+
+This repository provides the following artifact required for the evaluation of the **CENT**, "PIM is All You Need: A CXL-Enabled GPU-Free System for LLM Inference" paper published in ASPLOS 2025:
 
 * Figure 11, cost model python script
 * Figure 12(a~c), simulation
@@ -7,7 +9,15 @@
 * Figure 14(a, c), GPU raw data and simulation
 * Figure 14(b), GPU raw data
 
-### Prepare Environment
+## Directory Structure
+
+## Dependencies
+
+
+## Build
+
+Prepare the environment using the following commands:
+
 ```bash
 conda create -n cent_ae python=3.10
 conda activate cent_ae
@@ -42,3 +52,34 @@ influenced by chip production volumes.
 ```bash
 python figure_11.py
 ```
+
+## Citation
+
+If you use *CENT*, please cite this paper:
+
+> Yufeng Gu, Alireza Khadem, Sumanth Umesh, Ning Liang, Xavier Servot, Onur Mutlu, Ravi Iyer, and Reetuparna Das.
+> *PIM is All You Need: A CXL-Enabled GPU-Free System for LLM Inference*,
+> In 2025 International Conference on Architectural Support for Programming Languages and Operating Systems (ASPLOS)
+
+```
+@inproceedings{cent,
+  title={PIM is All You Need: A CXL-Enabled GPU-Free System for LLM Inference},
+  author={Gu, Yufeng and Khadem, Alireza and Umesh, Sumanth, and Liang, Ning and Servot, Xavier and Mutlu, Onur and Iyer, Ravi and and Das, Reetuparna},
+  booktitle={2025 International Conference on Architectural Support for Programming Languages and Operating Systems (ASPLOS)}, 
+  year={2025}
+}
+```
+
+## Issues and bug reporting
+
+We appreciate any feedback and suggestions from the community.
+Feel free to raise an issue or submit a pull request on Github.
+For assistance in using CENT, please contact: Yufeng Gu (yufenggu@umich.edu) and Alireza Khadem (arkhadem@umich.edu)
+
+## Licensing
+
+This repository is available under a [MIT license](/LICENSE).
+
+## Acknowledgement
+
+This work was supported in part by the NSF under the CAREER-1652294 and NSF-1908601 awards and by Intel gift.
