@@ -18,7 +18,7 @@ Prepare the environment using the following commands:
 git clone --recursive https://github.com/Yufeng98/CENT_AE.git
 cd CENT_AE
 
-conda create -n cent_ae python=3.10
+conda create -n cent_ae python=3.10 -y
 conda activate cent_ae
 pip install -r requirements.txt
 
@@ -45,7 +45,9 @@ rm figure_source_data/*
 ### Run Simulation
 ```bash
 cd cent_simulation
-bash simulation.sh
+# bash simulation.sh <set threads based on your platform>
+# We recomment 4 or 8 for desktop and more threads, e.g. 64, for server
+bash simulation.sh 8
 bash process_results.sh
 ```
 
