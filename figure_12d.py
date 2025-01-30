@@ -22,7 +22,7 @@ df = df_simulation_results[(df_simulation_results['Sequence length'] <= prefill_
 CENT_prefill_latency = df['Token latency (ms)'].mean() * prefill_size / 1000 / 60
 
 for d in decoding_list:
-    df = df_simulation_results[(df_simulation_results['Sequence length'] > prefill_size) & (df_simulation_results['Sequence length'] <= d)]
+    df = df_simulation_results[(df_simulation_results['Sequence length'] > prefill_size) & (df_simulation_results['Sequence length'] <= d + prefill_size)]
     CENT_decoding_latency_list.append(df['Token latency (ms)'].mean() * d / 1000 / 60)
 
 df_results = pd.DataFrame(columns=['Prefill Latency (min)', 'Decoding Latency (min)'])
