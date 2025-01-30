@@ -712,7 +712,7 @@ class TransformerBlockLlama(TransformerBlock):
                 channels_per_row_offset = (self.head_dim - 1) // self.num_banks + 1                 # 8
                 for channel in range(channels_required):
                     if banks_per_head < self.num_banks:
-                        print("banks_per_head", banks_per_head)
+                        # print("banks_per_head", banks_per_head)
                         raise ValueError("banks_per_head < self.num_banks. One head is mapped to less than one channel. Not enough channels are allocated.")
                     head = channel // (banks_per_head // self.num_banks)
                     if banks_per_head < 128:    # dim_iterations > 1, more than one dim in each row_offset are stored to a bank
@@ -1002,24 +1002,24 @@ class TransformerBlockLlama(TransformerBlock):
             FC_total_banks = total_banks
             channels_required = self.channels_per_block
         assert self.dic_size["x"] == self.dim
-        print("x\t\t\t {} x {}\t\t\t requires {} rows".format(1, self.dic_size["x"], self.dic_row["x"]))
-        print("x_copy\t\t {} x {}\t\t\t requires {} rows".format(1, self.dic_size["x"], self.dic_row["x"]))
-        print("SANorm\t\t {} x {}\t\t\t requires {} rows".format(1, self.dic_size["x"], self.dic_row["x"]))
-        print("FFNNorm\t\t {} x {}\t\t\t requires {} rows".format(1, self.dic_size["x"], self.dic_row["x"]))
+        # print("x\t\t\t {} x {}\t\t\t requires {} rows".format(1, self.dic_size["x"], self.dic_row["x"]))
+        # print("x_copy\t\t {} x {}\t\t\t requires {} rows".format(1, self.dic_size["x"], self.dic_row["x"]))
+        # print("SANorm\t\t {} x {}\t\t\t requires {} rows".format(1, self.dic_size["x"], self.dic_row["x"]))
+        # print("FFNNorm\t\t {} x {}\t\t\t requires {} rows".format(1, self.dic_size["x"], self.dic_row["x"]))
 
         self.dic_size["wq"] = self.wq.reshape(-1).shape[0]
         assert self.dic_size["wq"] == self.n_heads * self.head_dim * self.dim
         self.dic_row["wq"] = ((self.wq.shape[0] - 1) // FC_total_banks + 1) * ((self.wq.shape[1] - 1) // self.DRAM_column + 1)
-        print("wq\t\t\t {} x {} x {}\t requires {} rows".format(self.n_heads, self.dim, self.head_dim, self.dic_row["wq"]))
+        # print("wq\t\t\t {} x {} x {}\t requires {} rows".format(self.n_heads, self.dim, self.head_dim, self.dic_row["wq"]))
         self.dic_size["wk"] = self.wk.reshape(-1).shape[0]
 
         assert self.dic_size["wk"] == self.n_kv_heads * self.head_dim * self.dim
         self.dic_row["wk"] = ((self.wk.shape[0] - 1) // FC_total_banks + 1) * ((self.wk.shape[1] - 1) // self.DRAM_column + 1)
-        print("wk\t\t\t {} x {} x {} \t requires {} rows".format(self.n_heads, self.dim, self.head_dim, self.dic_row["wk"]))
+        # print("wk\t\t\t {} x {} x {} \t requires {} rows".format(self.n_heads, self.dim, self.head_dim, self.dic_row["wk"]))
         self.dic_size["wv"] = self.wv.reshape(-1).shape[0]
         assert self.dic_size["wv"] == self.n_kv_heads * self.head_dim * self.dim
         self.dic_row["wv"] = ((self.wv.shape[0] - 1) // FC_total_banks + 1) * ((self.wv.shape[1] - 1) // self.DRAM_column + 1)
-        print("wv\t\t\t {} x {} x {} \t requires {} rows".format(self.n_heads, self.dim, self.head_dim, self.dic_row["wv"]))
+        # print("wv\t\t\t {} x {} x {} \t requires {} rows".format(self.n_heads, self.dim, self.head_dim, self.dic_row["wv"]))
 
         self.dic_row["xq"] = 1
         self.dic_row["xk"] = 1
@@ -1028,13 +1028,13 @@ class TransformerBlockLlama(TransformerBlock):
         self.dic_size["cache_k"] = self.max_seq_len * self.n_kv_heads * self.head_dim
         assert self.cache_k.reshape(-1).shape[0] == (self.start_pos + 1) * self.n_kv_heads * self.head_dim
         self.dic_row["cache_k"] = ((self.max_seq_len - 1) // self.FC_total_banks + 1) * ((self.n_kv_heads * self.head_dim - 1) // self.DRAM_column + 1)
-        print("cache_k\t\t {} x {} x {}\t\t requires {} rows".format(self.n_kv_heads, self.head_dim, "L", self.dic_row["cache_k"]))
+        # print("cache_k\t\t {} x {} x {}\t\t requires {} rows".format(self.n_kv_heads, self.head_dim, "L", self.dic_row["cache_k"]))
 
         self.dic_size["scores"] = self.max_seq_len * self.n_kv_heads
         assert self.scores.reshape(-1).shape[0] == (self.start_pos + 1) * self.n_heads
         num_heads_per_bank = (self.n_heads - 1) // (self.channels_per_block * 4) + 1
         self.dic_row["scores"] = ((self.max_seq_len - 1) // self.DRAM_column + 1) * num_heads_per_bank
-        print("scores\t\t {} x {} x {}\t\t\t requires {} rows".format(self.n_heads, 1, "L", self.dic_row["scores"]))
+        # print("scores\t\t {} x {} x {}\t\t\t requires {} rows".format(self.n_heads, 1, "L", self.dic_row["scores"]))
 
         self.dic_size["cache_v"] = self.max_seq_len * self.n_kv_heads * self.head_dim
         assert self.cache_v.reshape(-1).shape[0] == (self.start_pos + 1) * self.n_kv_heads * self.head_dim
@@ -1043,21 +1043,21 @@ class TransformerBlockLlama(TransformerBlock):
         else:
             num_banks_per_head = (FC_total_banks - 1) // self.n_kv_heads + 1
             self.dic_row["cache_v"] = (self.max_seq_len - 1) // (self.DRAM_column * num_banks_per_head // self.head_dim) + 1
-        print("cache_v\t\t {} x {} x {}\t\t requires {} rows".format(self.n_kv_heads, "L", self.head_dim, self.dic_row["cache_v"]))
+        # print("cache_v\t\t {} x {} x {}\t\t requires {} rows".format(self.n_kv_heads, "L", self.head_dim, self.dic_row["cache_v"]))
 
         self.dic_size["output"] = self.output.reshape(-1).shape[0]
         assert self.dic_size["output"] == self.n_heads * self.head_dim
         self.dic_row["output"] = (self.dic_size["output"] // total_banks - 1) // self.DRAM_column + 1
-        print("output\t\t {} x {}\t\t\t requires {} rows".format(1, self.n_heads * self.head_dim, self.dic_row["output"]))
+        # print("output\t\t {} x {}\t\t\t requires {} rows".format(1, self.n_heads * self.head_dim, self.dic_row["output"]))
 
         self.dic_size["wo"] = self.wo.reshape(-1).shape[0]
         assert self.dic_size["wo"] == self.n_heads * self.head_dim * self.dim
         self.dic_row["wo"] = ((self.wo.shape[0] - 1) // FC_total_banks + 1) * ((self.wo.shape[1] - 1) // self.DRAM_column + 1)
-        print("wo\t\t\t {} x {} x {}\t requires {} rows".format(self.n_heads, self.dim, self.head_dim, self.dic_row["wo"]))
+        # print("wo\t\t\t {} x {} x {}\t requires {} rows".format(self.n_heads, self.dim, self.head_dim, self.dic_row["wo"]))
         self.dic_size["sa"] = self.sa.reshape(-1).shape[0]
         assert self.dic_size["sa"] == self.n_heads * self.head_dim
         self.dic_row["sa"] = (self.dic_size["sa"] // total_banks - 1) // self.DRAM_column + 1
-        print("sa\t\t\t {} x {}\t\t\t requires {} rows".format(1, self.n_heads * self.head_dim, self.dic_row["sa"]))
+        # print("sa\t\t\t {} x {}\t\t\t requires {} rows".format(1, self.n_heads * self.head_dim, self.dic_row["sa"]))
 
         ffn_dim = self.w1.shape[0]
         ffn_parallel_dim = (ffn_dim - 1) // total_banks + 1
@@ -1066,38 +1066,38 @@ class TransformerBlockLlama(TransformerBlock):
         self.dic_size["w1"] = self.w1.reshape(-1).shape[0]
         assert self.dic_size["w1"] == ffn_dim * self.dim
         self.dic_row["w1"] = ffn_FC_dim * ((self.dim - 1) // self.DRAM_column + 1)
-        print("w1\t\t\t {} x {} x {}\t requires {} rows".format(self.n_heads, self.dim, ffn_FC_dim, self.dic_row["w1"]))
+        # print("w1\t\t\t {} x {} x {}\t requires {} rows".format(self.n_heads, self.dim, ffn_FC_dim, self.dic_row["w1"]))
         self.dic_size["w3"] = self.w3.reshape(-1).shape[0]
         assert self.dic_size["w3"] == ffn_dim * self.dim
         self.dic_row["w3"] = ffn_FC_dim * ((self.dim - 1) // self.DRAM_column + 1)
-        print("w3\t\t\t {} x {} x {}\t requires {} rows".format(self.n_heads, self.dim, ffn_FC_dim, self.dic_row["w3"]))
+        # print("w3\t\t\t {} x {} x {}\t requires {} rows".format(self.n_heads, self.dim, ffn_FC_dim, self.dic_row["w3"]))
         self.dic_size["x1"] = ffn_dim
         self.dic_row["x1"] = (self.dic_size["x1"] // total_banks - 1) // self.DRAM_column + 1
-        print("x1\t\t\t {} x {} x {}\t\t requires {} rows".format(self.n_heads, 1, ffn_parallel_dim, self.dic_row["x1"]))
+        # print("x1\t\t\t {} x {} x {}\t\t requires {} rows".format(self.n_heads, 1, ffn_parallel_dim, self.dic_row["x1"]))
         self.dic_size["x3"] = ffn_dim
         self.dic_row["x3"] = (self.dic_size["x3"] // total_banks - 1) // self.DRAM_column + 1
-        print("x3\t\t\t {} x {} x {}\t\t requires {} rows".format(self.n_heads, 1, ffn_parallel_dim, self.dic_row["x3"]))
+        # print("x3\t\t\t {} x {} x {}\t\t requires {} rows".format(self.n_heads, 1, ffn_parallel_dim, self.dic_row["x3"]))
         self.dic_size["x1_sigmoid"] = ffn_dim
         self.dic_row["x1_sigmoid"] = (self.dic_size["x1_sigmoid"] // total_banks - 1) // self.DRAM_column + 1
-        print("x1_sigmoid\t {} x {} x {}\t\t requires {} rows".format(self.n_heads, 1, ffn_parallel_dim, self.dic_row["x1_sigmoid"]))
+        # print("x1_sigmoid\t {} x {} x {}\t\t requires {} rows".format(self.n_heads, 1, ffn_parallel_dim, self.dic_row["x1_sigmoid"]))
         self.dic_size["w2"] = self.w2.reshape(-1).shape[0]
         assert self.dic_size["w2"] == ffn_dim * self.dim
         self.dic_row["w2"] = ((self.dim - 1) // FC_total_banks + 1) * ((ffn_dim - 1) // self.DRAM_column + 1)
-        print("w2\t\t\t {} x {} x {}\t requires {} rows".format(self.n_heads, ffn_dim, self.head_dim, self.dic_row["w2"]))
+        # print("w2\t\t\t {} x {} x {}\t requires {} rows".format(self.n_heads, ffn_dim, self.head_dim, self.dic_row["w2"]))
         self.dic_size["ffn"] = self.ffn.reshape(-1).shape[0]
         assert self.dic_size["ffn"] == self.dim
         self.dic_row["ffn"] = (self.dic_size["ffn"] // total_banks - 1) // self.DRAM_column + 1
-        print("ffn\t\t\t {} x {}\t\t\t requires {} rows".format(1, self.dim, self.dic_row["ffn"]))
+        # print("ffn\t\t\t {} x {}\t\t\t requires {} rows".format(1, self.dim, self.dic_row["ffn"]))
 
         size = sum([self.dic_size[key] for key in self.dic_size.keys()])
         rows = sum([self.dic_row[key] for key in self.dic_row.keys()])
 
         DIMMs_required = (channels_required - 1) // self.num_channels + 1
-        print("\nAllocated {} DIMMs {} Channels".format(DIMMs_required, channels_required))
-        print(size * 2 // (1024 * 1024), "MB are required in {} channels".format(self.channels_per_block))
-        print(rows, "rows are required in a bank")
+        # print("\nAllocated {} DIMMs {} Channels".format(DIMMs_required, channels_required))
+        # print(size * 2 // (1024 * 1024), "MB are required in {} channels".format(self.channels_per_block))
+        # print(rows, "rows are required in a bank")
         task_level_parallelism = (self.DRAM_row - rows) // (self.dic_row["cache_k"] + self.dic_row["cache_v"]) + 1
-        print(task_level_parallelism, "tasks are available to execute in parallel\n")
+        # print(task_level_parallelism, "tasks are available to execute in parallel\n")
         # dimm_lst = ["dimm_" + str(i) for i in range(DIMMs_required)]
         # self.pim_device = {}
         # for dimm in dimm_lst:

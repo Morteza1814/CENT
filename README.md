@@ -29,7 +29,7 @@ cd build
 cmake ..
 make -j4
 cp ./ramulator2 ../ramulator2
-cd ..
+cd ../../
 ```
 
 ## Artifact Scripts

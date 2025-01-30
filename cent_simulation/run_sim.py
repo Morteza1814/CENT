@@ -45,6 +45,8 @@ def factorize(n):
 
 def generate_trace(args, seqlen_list):
 
+    print(f"Generating traces for {args.model} with {args.generate_trace_max_workers} threads...")
+
     if args.model == "GPT3-175B":
         model = "--GPT3-175B"
     elif args.model == "Llama2-70B" or "Llama3" in args.model:
@@ -86,6 +88,7 @@ def generate_trace(args, seqlen_list):
             future.result()
 
 def run_command(command, log_file):
+    print(command)
     result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     filtered_output = "\n".join(line for line in result.stdout.splitlines() if not line.startswith('['))
     with open(log_file, "w") as log:
@@ -144,6 +147,7 @@ def simulate_trace(args, seqlen_list):
             future.result()
 
 def process_results(args):
+    print("Processing results...")
     mode_list = model_parallel_mode_list if args.model_parallel else pipeline_parallel_mode_list
     for mode in mode_list:
         compile_dir = f"../trace/{args.num_channels}_channels_per_device/{mode}/{args.model}/"
@@ -251,6 +255,8 @@ def load_data_point(args, seqlen, FC_devices, channels_per_block, PCIe_lanes_per
 
 def update_csv(args, seqlen_list):
 
+    print("Updating simulation results to CSV file...")
+
     if os.path.exists(args.simulation_result_path):
         results_df = pd.read_csv(args.simulation_result_path)
     else:
@@ -309,6 +315,8 @@ def update_csv(args, seqlen_list):
     # print(results_df)
 
 def process_throughputs(args):
+
+    print("Processing results to CSV file...")
 
     if os.path.exists(args.simulation_result_path):
         df_simulation = pd.read_csv(args.simulation_result_path)

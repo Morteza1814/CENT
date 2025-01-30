@@ -46,7 +46,7 @@ if __name__ == "__main__":
         dic_model["n_kv_heads"] = torch.tensor(n_kv_heads)
     
     TB = TransformerBlockLlama(dic_model, args) if args.Llama_GQA or args.Llama or args.filename else TransformerBlockGPT(dic_model, args)
-    print("Variable\t Dimension\t\t\t Rows required\n")
+    # print("Variable\t Dimension\t\t\t Rows required\n")
     TB.memory_mapping()
 
     if args.only_trace:
