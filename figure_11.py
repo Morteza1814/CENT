@@ -1,4 +1,9 @@
+import os
+import pandas as pd
 from cost_model.supply_chain_model import mw_mask_costs_arr, mw_ip_costs_arr, mw_backend_labor_cost_per_week, mw_backend_cad_license_per_eng_week, mw_frontend_labor_cost_per_week, mw_flip_chip_bga_package_design_cost, mw_system_NRE_cost
+
+if os.path.exists("figure_source_data") == False:
+    os.mkdir("figure_source_data")
 
 # inflation from 2016 to 2024 = 31%
 # https://www.in2013dollars.com/us/inflation/2016?amount=1
@@ -18,6 +23,22 @@ IP_Licensing_Cost = mw_ip_costs_arr[pn_i] * inflation_factor
 Packaging_Cost = mw_flip_chip_bga_package_design_cost * inflation_factor
 System_Cost = mw_system_NRE_cost * inflation_factor
 Total_NRE_Cost = Mask_Cost + Backend_Labor_Cost + Backend_CAD_Cost + Frontend_Labor_Cost + IP_Licensing_Cost + Packaging_Cost + System_Cost
+
+def add_to_df(name, value, df_nre):
+    new_row = {name: value}
+    df_new = pd.DataFrame(new_row, index=[0])
+    return pd.concat([df_nre, df_new], ignore_index=True)
+
+df_nre = pd.DataFrame(columns=['NRE Cost'])
+df_nre = add_to_df("Mask", Mask_Cost, df_nre)
+df_nre = add_to_df("Backend Labor", Backend_Labor_Cost, df_nre)
+df_nre = add_to_df("Backend CAD", Backend_CAD_Cost, df_nre)
+df_nre = add_to_df("Frontend Labor", Frontend_Labor_Cost, df_nre)
+df_nre = add_to_df("IP Licensing", IP_Licensing_Cost, df_nre)
+df_nre = add_to_df("Package Design", Packaging_Cost, df_nre)
+df_nre = add_to_df("System NRE", System_Cost, df_nre)
+df_nre = add_to_df("Total NRE", Total_NRE_Cost, df_nre)
+df_nre.to_csv('figure_source_data/figure_11b.csv', index=False)
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -46,7 +67,7 @@ ax.set_ylabel("Million Dollar ($)")
 ax.set_xlabel("NRE Cost")
 ax.legend()
 
-plt.savefig("figure_11b.pdf")
+plt.savefig("figures/figure_11b.pdf")
 
 from cost_model.supply_chain_model import wafer_costs_arr, defect_density_vector_mm2, yield_rate, num_wafers_needed
 
@@ -77,6 +98,18 @@ nre_cost = Device_NRE_cost_list        # NRE cost
 packaging_cost = [CENT_package_cost] * 5  # Packaging cost
 die_cost = [CENT_die_cost] * 5     # Die cost
 
+df_cost = pd.DataFrame(columns=['Production Volume (Million)', 'Die Cost ($)', 'Packaging Cost ($)', 'NRE Cost ($)'])
+for i in range(len(production_volume)):
+    new_row = {
+        'Production Volume (Million)': production_volume[i],
+        'Die Cost ($)': die_cost[i],
+        'Packaging Cost ($)': packaging_cost[i],
+        'NRE Cost ($)': nre_cost[i]
+    }
+    df_new = pd.DataFrame(new_row, index=[0])    
+    df_cost = pd.concat([df_cost, df_new], ignore_index=True)
+df_cost.to_csv('figure_source_data/figure_11a.csv', index=False)
+
 # Stacked bar chart
 fig, ax = plt.subplots(figsize=(5, 4))
 
@@ -97,5 +130,7 @@ ax.set_ylabel("Cost ($)")
 ax.set_xticks(production_volume)
 ax.legend(loc="upper right")
 
-plt.savefig("figure_11a.pdf")
+if os.path.exists("figures") == False:
+    os.mkdir("figures")
+plt.savefig("figures/figure_11a.pdf")
 

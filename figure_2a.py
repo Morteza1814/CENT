@@ -1,21 +1,5 @@
 import matplotlib.pyplot as plt
-
-def load_QoS_file(filename):
-    dic = {}
-    latency = []
-    throughput = []
-    batch = []
-    with open(filename, "r") as f:
-        lines = f.readlines()
-        for line in lines[1:]:
-            lst = line.split(",")
-            batch.append(float(lst[0]))
-            latency.append(float(lst[1])/60)
-            throughput.append(float(lst[2]))
-    dic["batch"] = batch
-    dic["latency"] = latency
-    dic["throughput"] = throughput
-    return dic
+from utils import load_QoS_file
 
 def latency_plot():
     dic_GPU_70B_4k = load_QoS_file("data/GPU_70B_4k.csv")
@@ -45,6 +29,10 @@ def latency_plot():
     plt.tick_params(axis='y', labelsize=font)
     plt.xlabel('Batch Size', fontsize=font)
     plt.ylabel('Query Latency (min)', fontsize=font)
-    plt.savefig('figure_2a.pdf')
+
+    import os
+    if os.path.exists("figures") == False:
+        os.mkdir("figures")
+    plt.savefig('figures/figure_2a.pdf')
 
 latency_plot()

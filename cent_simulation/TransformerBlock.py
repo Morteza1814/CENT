@@ -91,7 +91,7 @@ class TransformerBlock(PIM):
         self.total_banks = self.channels_per_block * self.num_banks
         if self.model_parallel:
             self.FC_total_banks = self.total_banks * self.FC_devices
-            self.intra_device_attention = False
+            self.intra_device_attention = True
             banks_per_head = (self.FC_total_banks - 1) // self.n_kv_heads + 1
             if banks_per_head < self.num_banks:
                 self.intra_device_attention = True

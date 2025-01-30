@@ -38,7 +38,7 @@ cd ..
 ```bash
 cd cent_simulation
 bash simulation.sh
-bash parse_results.sh > throughput.txt
+bash process_results.sh
 ```
 
 ### Figure 2(a) 

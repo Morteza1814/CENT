@@ -27,6 +27,7 @@ def get_args():
     parser.add_argument("--phase", choices=["end2end", "prefill", "decoding"], help="Phase of the model", default="end2end")
     parser.add_argument("--prefill", type=int, help="Prefill length", default=512)
     parser.add_argument("--decoding", type=int, help="Decoding length", default=3584)
+    parser.add_argument("--seqlen", type=int, nargs='+', help="Sequence list")
     parser.add_argument("--seqlen_gap", type=int, help="Gap between sequence lengths", default=128)
     parser.add_argument("--model_parallel", action="store_true", help="Apply model parallelism")
     args = parser.parse_args()
@@ -42,7 +43,14 @@ def factorize(n):
                 factors.append(n // i)
     return sorted(factors)
 
-def generate_trace(args):
+def generate_trace(args, seqlen_list):
+
+    if args.model == "GPT3-175B":
+        model = "--GPT3-175B"
+    elif args.model == "Llama2-70B" or "Llama3" in args.model:
+        model = "--Llama-GQA"
+    elif "Llama2" in args.model:
+        model = "--Llama"
 
     commands_generate_traces = []
     blocks_per_device = (TransformerBlock_number[args.model] - 1) // args.num_devices + 1
@@ -57,7 +65,7 @@ def generate_trace(args):
                 commands_generate_traces.append(["python3", "function_sim.py", model, "--n_heads", str(n_heads[args.model]), "--ffn_dim", str(ffn_size[args.model]), "--embedding", "--only-trace", "--num-channels", str(args.num_channels), "--FC-devices", str(FC_devices), "--model-parallel", "--seqlen", str(seqlen), "--op-trace", "--GEMV", "reuse-GB", "--reuse-size", str(args.reuse_size), "--trace-file", f"../trace/{args.num_channels}_channels_per_device/model_parallel_embedding/{args.model}/trace_{FC_devices}_FC_devices_seqlen_{seqlen}.txt"])
     else:
         if not os.path.exists(f"../trace/{args.num_channels}_channels_per_device/pipeline_parallel_embedding/{args.model}/trace_{channels_per_block}_channels_per_block_seqlen_{seqlen}.txt"):
-            commands_generate_traces.append(["python3", "function_sim.py", model, "--n_heads", str(n_heads[args.model]), "--ffn_dim", str(ffn_size[args.model]), "--embedding", "--only-trace", "--num-channels", str(args.num_channels), "--channels-per-block", str(channels_per_block), "--pipeline_parallel", "--multi-tb-per-device", "--seqlen", str(seqlen), "--op-trace", "--GEMV", "reuse-GB", "--reuse-size", str(args.reuse_size), "--trace-file", f"../trace/{args.num_channels}_channels_per_device/pipeline_parallel_embedding/{args.model}/trace_{channels_per_block}_channels_per_block_seqlen_{seqlen}.txt"])
+            commands_generate_traces.append(["python3", "function_sim.py", model, "--n_heads", str(n_heads[args.model]), "--ffn_dim", str(ffn_size[args.model]), "--embedding", "--only-trace", "--num-channels", str(args.num_channels), "--channels-per-block", str(channels_per_block), "--pipeline-parallel", "--multi-tb-per-device", "--seqlen", str(seqlen), "--op-trace", "--GEMV", "reuse-GB", "--reuse-size", str(args.reuse_size), "--trace-file", f"../trace/{args.num_channels}_channels_per_device/pipeline_parallel_embedding/{args.model}/trace_{channels_per_block}_channels_per_block_seqlen_{seqlen}.txt"])
 
     for seqlen in seqlen_list:
         if args.model_parallel:
@@ -70,7 +78,7 @@ def generate_trace(args):
             if channels_per_block < minimal_channel_per_block[args.model]:
                 raise ValueError(f"Channels per block {channels_per_block} is less than minimal channel per block {minimal_channel_per_block[args.model]}")
             if not os.path.exists(f"../trace/{args.num_channels}_channels_per_device/pipeline_parallel/{args.model}/trace_{channels_per_block}_channels_per_block_seqlen_{seqlen}.txt"):
-                commands_generate_traces.append(["python3", "function_sim.py", model, "--n_heads", str(n_heads[args.model]), "--ffn_dim", str(ffn_size[args.model]), "--only-trace", "--num-channels", str(args.num_channels), "--channels-per-block", str(channels_per_block), "--pipeline_parallel", "--multi-tb-per-device", "--seqlen", str(seqlen), "--op-trace", "--GEMV", "reuse-GB", "--reuse-size", str(args.reuse_size), "--trace-file", f"../trace/{args.num_channels}_channels_per_device/pipeline_parallel/{args.model}/trace_{channels_per_block}_channels_per_block_seqlen_{seqlen}.txt"])
+                commands_generate_traces.append(["python3", "function_sim.py", model, "--n_heads", str(n_heads[args.model]), "--ffn_dim", str(ffn_size[args.model]), "--only-trace", "--num-channels", str(args.num_channels), "--channels-per-block", str(channels_per_block), "--pipeline-parallel", "--multi-tb-per-device", "--seqlen", str(seqlen), "--op-trace", "--GEMV", "reuse-GB", "--reuse-size", str(args.reuse_size), "--trace-file", f"../trace/{args.num_channels}_channels_per_device/pipeline_parallel/{args.model}/trace_{channels_per_block}_channels_per_block_seqlen_{seqlen}.txt"])
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.generate_trace_max_workers) as executor:
         futures = [executor.submit(subprocess.run, cmd) for cmd in commands_generate_traces]
@@ -83,7 +91,7 @@ def run_command(command, log_file):
     with open(log_file, "w") as log:
         log.write(filtered_output)
 
-def simulate_trace(args):
+def simulate_trace(args, seqlen_list):
     commands_simulate_traces = []
 
 	# ../ramulator2/build/ramulator2 -f ../ramulator2/test/example.yaml -t ../trace/48_channels_per_device/pipeline_parallel/Llama2-7B/trace_16_channels_per_block_seqlen_{seqlen}.txt 2>&1 | grep '^[^\[]' &> ../trace/48_channels_per_device/pipeline_parallel/Llama2-7B/trace_16_channels_per_block_seqlen_{seqlen}.txt.log
@@ -241,7 +249,7 @@ def load_data_point(args, seqlen, FC_devices, channels_per_block, PCIe_lanes_per
     return new_result_df
 
 
-def update_csv(args):
+def update_csv(args, seqlen_list):
 
     if os.path.exists(args.simulation_result_path):
         results_df = pd.read_csv(args.simulation_result_path)
@@ -275,12 +283,12 @@ def update_csv(args):
         PCIe_lanes_per_device = args.PCIE_lanes // args.num_devices
 
         if args.model_parallel:
-            pp = 1
             blocks_per_device = 1
             channels_per_block = args.num_channels // blocks_per_device
             utilized_devices = args.num_devices
             for FC_devices in FC_devices_list:
-                tp = args.num_devices // FC_devices
+                pp = args.num_devices // FC_devices
+                tp = FC_devices
                 new_result_df = load_data_point(args, seqlen, FC_devices, channels_per_block, PCIe_lanes_per_device, blocks_per_device, embedding_latency, utilized_devices, pp, tp)
                 results_df = pd.concat([results_df, new_result_df], ignore_index=True)
         else:
@@ -310,7 +318,7 @@ def process_throughputs(args):
     if os.path.exists(args.processed_result_path):
         results_df = pd.read_csv(args.processed_result_path)
     else:
-        columns = ['Model', 'Device number', 'Pipeline parallelism', 'Tensor parallelism', 'Phase', 'Total Latency (s)', 'Throughput (tokens/s)', 'Energy per Token (mJ)']
+        columns = ['Model', 'Device number', 'Seqlen', 'Pipeline parallelism', 'Tensor parallelism', 'Phase', 'Total Latency (s)', 'Throughput (tokens/s)', 'Energy per Token (mJ)']
         results_df = pd.DataFrame(columns=columns)
 
 
@@ -320,17 +328,19 @@ def process_throughputs(args):
 
         for FC_Devices in FC_devices_list:
 
-            tp = args.num_devices // FC_Devices
-            df = df_simulation[(df_simulation['Model'] == args.model) & (df_simulation['Pipeline parallelism'] == 1) & (df_simulation['Tensor parallelism'] == tp)]
+            pp = args.num_devices // FC_Devices
+            tp = FC_Devices
+            df = df_simulation[(df_simulation['Model'] == args.model) & (df_simulation['Device number'] == 32) & (df_simulation['Pipeline parallelism'] == pp) & (df_simulation['Tensor parallelism'] == tp)]
             # print("tp", tp, len(df))
 
             if args.phase == "prefill":
                 df = df[(df['Sequence length'] < args.prefill)]
                 seqlen = args.prefill
             elif args.phase == "decoding":
-                df = df[(df['Sequence length'] >= args.prefill)]
+                df = df[(args.decoding >= df['Sequence length']) & (df['Sequence length'] > args.prefill)]
                 seqlen = args.decoding
             elif args.phase == "end2end":
+                df = df[(args.decoding >= df['Sequence length'])]
                 seqlen = args.prefill + args.decoding
 
             average_throughput = df['Throughput (tokens/s)'].mean()
@@ -340,7 +350,8 @@ def process_throughputs(args):
             new_result = {
                 'Model': args.model,
                 'Device number': args.num_devices,
-                'Pipeline parallelism': 1,
+                'Seqlen': args.prefill + args.decoding,
+                'Pipeline parallelism': pp,
                 'Tensor parallelism': tp,
                 'Phase': args.phase,
                 'Total Latency (s)': total_latency,
@@ -352,14 +363,16 @@ def process_throughputs(args):
 
     else:
 
-        df = df_simulation[(df_simulation['Model'] == args.model) & (df_simulation['Pipeline parallelism'] == TransformerBlock_number[args.model]) & (df_simulation['Tensor parallelism'] == 1)]
+        df = df_simulation[(df_simulation['Model'] == args.model) & (df_simulation['Device number'] == 32) & (df_simulation['Pipeline parallelism'] == TransformerBlock_number[args.model]) & (df_simulation['Tensor parallelism'] == 1)]
+
         if args.phase == "prefill":
             df = df[(df['Sequence length'] < args.prefill)]
             seqlen = args.prefill
         elif args.phase == "decoding":
-            df = df[(df['Sequence length'] >= args.prefill)]
+            df = df[(args.decoding >= df['Sequence length']) & (df['Sequence length'] > args.prefill)]
             seqlen = args.decoding
         elif args.phase == "end2end":
+            df = df[(args.decoding >= df['Sequence length'])]
             seqlen = args.prefill + args.decoding
 
         average_throughput = df['Throughput (tokens/s)'].mean()
@@ -369,6 +382,7 @@ def process_throughputs(args):
         new_result = {
             'Model': args.model,
             'Device number': args.num_devices,
+            'Seqlen': args.prefill + args.decoding,
             'Pipeline parallelism': TransformerBlock_number[args.model],
             'Tensor parallelism': 1,
             'Phase': args.phase,
@@ -380,7 +394,7 @@ def process_throughputs(args):
         results_df = pd.concat([results_df, new_result_df], ignore_index=True)
     
     results_df = results_df.drop_duplicates()
-    results_df = results_df.sort_values(by=['Model', 'Model', 'Device number', 'Pipeline parallelism', 'Tensor parallelism', 'Phase'])
+    results_df = results_df.sort_values(by=['Model', 'Device number', 'Seqlen', 'Pipeline parallelism', 'Tensor parallelism', 'Phase'])
     results_df.to_csv(args.processed_result_path, index=False)
 
 
@@ -389,30 +403,25 @@ if __name__ == "__main__":
 
     args = get_args()
 
-    
-    if args.model == "GPT3-175B":
-        model = "--GPT3-175B"
-    elif args.model == "Llama2-70B" or "Llama3" in args.model:
-        model = "--Llama-GQA"
-    elif "Llama2" in args.model:
-        model = "--Llama"
-
-    seqlen_list = [i * args.seqlen_gap for i in range(1, (args.prefill + args.decoding) // args.seqlen_gap + 1)]
+    if args.seqlen:
+        seqlen_list = args.seqlen
+    else:
+        seqlen_list = [i * args.seqlen_gap for i in range(1, (args.prefill + args.decoding) // args.seqlen_gap + 1)]
         
     for mode in pipeline_parallel_mode_list + model_parallel_mode_list:
         subprocess.run(["mkdir", "-p", f"../trace/{args.num_channels}_channels_per_device/{mode}/{args.model}"])
 
     if args.generate_trace:
-        generate_trace(args)
+        generate_trace(args, seqlen_list)
         
     if args.simulate_trace:
-        simulate_trace(args)
+        simulate_trace(args, seqlen_list)
 
     if args.process_results:
         process_results(args)
         
     if args.update_csv:
-        update_csv(args)
+        update_csv(args, seqlen_list)
         
     if args.process_throughputs:
         process_throughputs(args)
