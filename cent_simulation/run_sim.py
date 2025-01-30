@@ -122,12 +122,6 @@ def simulate_trace(args, seqlen_list):
     for seqlen in seqlen_list:
         if args.model_parallel:
             for FC_devices in FC_devices_list:
-                if not os.path.exists(f"../trace/{args.num_channels}_channels_per_device/model_parallel_embedding/{args.model}/trace_{FC_devices}_FC_devices_seqlen_{seqlen}.txt.log"):
-                    trace_file = f"../trace/{args.num_channels}_channels_per_device/model_parallel_embedding/{args.model}/trace_{FC_devices}_FC_devices_seqlen_{seqlen}.txt"
-                    log_file = f"../trace/{args.num_channels}_channels_per_device/model_parallel_embedding/{args.model}/trace_{FC_devices}_FC_devices_seqlen_{seqlen}.txt.log"
-                    command = f"../ramulator2/build/ramulator2 -f ../ramulator2/test/example.yaml -t {trace_file}"
-                    commands_simulate_traces.append((command, log_file))
-
                 for mode in ["model_parallel", "model_parallel_FC"]:
                     if not os.path.exists(f"../trace/{args.num_channels}_channels_per_device/{mode}/{args.model}/trace_{FC_devices}_FC_devices_seqlen_{seqlen}.txt.log"):
                         trace_file = f"../trace/{args.num_channels}_channels_per_device/{mode}/{args.model}/trace_{FC_devices}_FC_devices_seqlen_{seqlen}.txt"
