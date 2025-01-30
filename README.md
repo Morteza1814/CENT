@@ -2,28 +2,32 @@
 
 This repository provides the following artifact required for the evaluation of the **CENT**, "PIM is All You Need: A CXL-Enabled GPU-Free System for LLM Inference" paper published in ASPLOS 2025:
 
-## Directory Structure
-
-TODO
-
 ## Dependencies
 
 AiM Simulator is tested and verified with `g++-12` and `clang++-15`.
 
 ## Build
 
-Prepare the environment using the following commands:
+Clone the repository recursively
 
 ```bash
 git clone --recursive https://github.com/Yufeng98/CENT_AE.git
 cd CENT_AE
+```
 
+Create conda environment
+
+```bash
 conda create -n cent_ae python=3.10 -y
 conda activate cent_ae
 pip install -r requirements.txt
+```
 
+Build AiM simulator
+
+```bash
+# use g++-11/12/13
 cd ramulator2
-# only gcc-12 is supported
 mkdir build
 cd build
 cmake ..
@@ -36,30 +40,32 @@ cd ../../
 
 Remove old results
 ```bash
-rm simulation_results.csv
-rm processed_results.csv
-rm figures/*
-rm figure_source_data/*
+bash remove_old_results.sh
 ```
 
 ### Run Simulation
 ```bash
 cd cent_simulation
 # bash simulation.sh <set threads based on your platform>
-# We recomment 4 or 8 for desktop and more threads, e.g. 64, for server
+# 8 threads on a desktop takes ~16 hours for simulation, and reqiures ~16GB memory
+# 96 threads on a server takes ~4 hours for simulation, and requires ~64GB memory
 bash simulation.sh 8
 bash process_results.sh
 ```
 
 ### Figure 11
+
 The CXL controller costs are broken down into die, packaging and Non Recurring Engineering (NRE) components. The die cost is derived from the wafer cost, considering the CXL controller die area and yield rate. The cost of 2D packaging is assumed to be 29% of chip cost (die and package). The NRE cost is
 influenced by chip production volumes.
+
 ```bash
 python figure_11.py
 ```
 
 ### Figure 12
+
 Analysis on Llama2-70B. (a) CENT achieves higher decoding throughputs with long context windows and 3.5K decoding sizes. (b) QoS analysis: CENT shows less query latency when achieving the similar to GPUs. (c) CENT latency breakdown with different parallelism strategies. (d) Prefill (In) and decoding (Out) latency comparison with different In/Out sizes, at maximum supported batches for both GPU and CENT.
+
 ```bash
 python figure_12a.py
 python figure_12b.py
@@ -68,7 +74,9 @@ python figure_12d.py
 ```
 
 ### Figure 13
+
 CENT speedup over GPU baselines. (a) Batch = 1 Latency comparison. (b) Throughput comparison under the highest batch size that CENT and GPU and achieve. (c) TCO normalized throughput comprison.
+
 ```bash
 python figure_13a.py
 python figure_13b.py
@@ -76,7 +84,9 @@ python figure_13c.py
 ```
 
 ### Figure 14
+
 Power and energy analysis. (a) Power consumption, (b) GPU SM frequency and board power, and (c) energy efficiency of CENT and GPU for different stages of Llama2 models using the maximum batch size, 512 prefill tokens and 3584 decoding tokens.
+
 ```bash
 python figure_14a.py
 python figure_14c.py

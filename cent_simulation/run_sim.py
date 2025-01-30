@@ -97,7 +97,7 @@ def run_command(command, log_file):
 def simulate_trace(args, seqlen_list):
     commands_simulate_traces = []
 
-	# ../ramulator2/build/ramulator2 -f ../ramulator2/test/example.yaml -t ../trace/48_channels_per_device/pipeline_parallel/Llama2-7B/trace_16_channels_per_block_seqlen_{seqlen}.txt 2>&1 | grep '^[^\[]' &> ../trace/48_channels_per_device/pipeline_parallel/Llama2-7B/trace_16_channels_per_block_seqlen_{seqlen}.txt.log
+	# ../ramulator2/build/ramulator2 -f ../ramulator2/test/example.yaml -t ../trace/32_channels_per_device/pipeline_parallel/Llama2-7B/trace_8_channels_per_block_seqlen_1.txt 2>&1 | grep '^[^\[]' &> ../trace/32_channels_per_device/pipeline_parallel/Llama2-7B/trace_8_channels_per_block_seqlen_1.txt.log
 
     blocks_per_device = (TransformerBlock_number[args.model] - 1) // args.num_devices + 1
     channels_per_block = args.num_channels // blocks_per_device
