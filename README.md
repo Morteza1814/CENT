@@ -15,11 +15,13 @@ AiM Simulator is tested and verified with `g++-12` and `clang++-15`.
 Prepare the environment using the following commands:
 
 ```bash
+git clone --recursive https://github.com/Yufeng98/CENT_AE.git
+cd CENT_AE
+
 conda create -n cent_ae python=3.10
 conda activate cent_ae
 pip install -r requirements.txt
 
-git submodule add https://github.com/arkhadem/ramulator2.git ramulator2
 cd ramulator2
 # only gcc-12 is supported
 mkdir build
