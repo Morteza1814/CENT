@@ -22,7 +22,7 @@ Prepare the environment using the following commands:
 ```bash
 conda create -n cent_ae python=3.10
 conda activate cent_ae
-pip install pandas matplotlib ipykernel torch
+pip install -r requirements.txt
 git submodule add https://github.com/arkhadem/ramulator2.git ramulator2
 cd ramulator2
 # only gcc-12 is supported

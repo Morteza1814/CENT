@@ -19,8 +19,8 @@ for seqlen in seqlen_list:
     cent_throughput_list.append(df['Throughput (tokens/s)'].mean().item())
     speedup_list.append(cent_throughput_list[-1] / gpu_throughput_list[seqlen_list.index(seqlen)])
 
-print(cent_throughput_list)
-print(gpu_throughput_list)
+# print(cent_throughput_list)
+# print(gpu_throughput_list)
 
 context_lengths = ["4K", "8K", "16K", "32K"]
 # Plot

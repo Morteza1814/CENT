@@ -330,17 +330,17 @@ def process_throughputs(args):
 
             pp = args.num_devices // FC_Devices
             tp = FC_Devices
-            df = df_simulation[(df_simulation['Model'] == args.model) & (df_simulation['Device number'] == 32) & (df_simulation['Pipeline parallelism'] == pp) & (df_simulation['Tensor parallelism'] == tp)]
+            df = df_simulation[(df_simulation['Model'] == args.model) & (df_simulation['Pipeline parallelism'] == pp) & (df_simulation['Tensor parallelism'] == tp)]
             # print("tp", tp, len(df))
 
             if args.phase == "prefill":
-                df = df[(df['Sequence length'] < args.prefill)]
+                df = df[(df['Sequence length'] <= args.prefill)]
                 seqlen = args.prefill
             elif args.phase == "decoding":
-                df = df[(args.decoding >= df['Sequence length']) & (df['Sequence length'] > args.prefill)]
+                df = df[((args.prefill + args.decoding) >= df['Sequence length']) & (df['Sequence length'] > args.prefill)]
                 seqlen = args.decoding
             elif args.phase == "end2end":
-                df = df[(args.decoding >= df['Sequence length'])]
+                df = df[((args.prefill + args.decoding) >= df['Sequence length'])]
                 seqlen = args.prefill + args.decoding
 
             average_throughput = df['Throughput (tokens/s)'].mean()
@@ -363,16 +363,16 @@ def process_throughputs(args):
 
     else:
 
-        df = df_simulation[(df_simulation['Model'] == args.model) & (df_simulation['Device number'] == 32) & (df_simulation['Pipeline parallelism'] == TransformerBlock_number[args.model]) & (df_simulation['Tensor parallelism'] == 1)]
+        df = df_simulation[(df_simulation['Model'] == args.model) & (df_simulation['Pipeline parallelism'] == TransformerBlock_number[args.model]) & (df_simulation['Tensor parallelism'] == 1)]
 
         if args.phase == "prefill":
-            df = df[(df['Sequence length'] < args.prefill)]
+            df = df[(df['Sequence length'] <= args.prefill)]
             seqlen = args.prefill
         elif args.phase == "decoding":
-            df = df[(args.decoding >= df['Sequence length']) & (df['Sequence length'] > args.prefill)]
+            df = df[((args.prefill + args.decoding) >= df['Sequence length']) & (df['Sequence length'] > args.prefill)]
             seqlen = args.decoding
         elif args.phase == "end2end":
-            df = df[(args.decoding >= df['Sequence length'])]
+            df = df[((args.prefill + args.decoding) >= df['Sequence length'])]
             seqlen = args.prefill + args.decoding
 
         average_throughput = df['Throughput (tokens/s)'].mean()
