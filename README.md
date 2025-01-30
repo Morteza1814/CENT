@@ -37,6 +37,8 @@ cd ..
 ### Run Simulation
 ```bash
 cd cent_simulation
+rm simulation_results.csv
+rm processed_results.csv
 bash simulation.sh
 bash process_results.sh
 ```
