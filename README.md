@@ -41,17 +41,20 @@ bash simulation.sh
 bash process_results.sh
 ```
 
-### Figure 2(a) 
-Llama2-70B inference query latency increases with larger batches on 4 A100 80GB GPUs, with prompt=512, decoding=3584
-```bash
-python figure_2a/figure.py
-```
-
 ### Figure 11
 The CXL controller costs are broken down into die, packaging and Non Recurring Engineering (NRE) components. The die cost is derived from the wafer cost, considering the CXL controller die area and yield rate. The cost of 2D packaging is assumed to be 29% of chip cost (die and package). The NRE cost is
 influenced by chip production volumes.
 ```bash
 python figure_11.py
+```
+
+### Figure 12
+Analysis on Llama2-70B. (a) CENT achieves higher decoding throughputs with long context windows and 3.5K decoding sizes. (b) QoS analysis: CENT shows less query latency when achieving the similar to GPUs. (c) CENT latency breakdown with different parallelism strategies. (d) Prefill (In) and decoding (Out) latency comparison with different In/Out sizes, at maximum supported batches for both GPU and CENT.
+```bash
+python figure_12a.py
+python figure_12b.py
+python figure_12c.py
+python figure_12d.py
 ```
 
 ## Citation
