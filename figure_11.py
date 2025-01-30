@@ -30,14 +30,14 @@ def add_to_df(name, value, df_nre):
     return pd.concat([df_nre, df_new], ignore_index=True)
 
 df_nre = pd.DataFrame(columns=['NRE Cost'])
-df_nre = add_to_df("Mask", Mask_Cost, df_nre)
-df_nre = add_to_df("Backend Labor", Backend_Labor_Cost, df_nre)
-df_nre = add_to_df("Backend CAD", Backend_CAD_Cost, df_nre)
-df_nre = add_to_df("Frontend Labor", Frontend_Labor_Cost, df_nre)
-df_nre = add_to_df("IP Licensing", IP_Licensing_Cost, df_nre)
-df_nre = add_to_df("Package Design", Packaging_Cost, df_nre)
-df_nre = add_to_df("System NRE", System_Cost, df_nre)
-df_nre = add_to_df("Total NRE", Total_NRE_Cost, df_nre)
+df_nre = add_to_df("NRE Cost", Mask_Cost, df_nre)
+df_nre = add_to_df("NRE Cost", Backend_Labor_Cost, df_nre)
+df_nre = add_to_df("NRE Cost", Backend_CAD_Cost, df_nre)
+df_nre = add_to_df("NRE Cost", Frontend_Labor_Cost, df_nre)
+df_nre = add_to_df("NRE Cost", IP_Licensing_Cost, df_nre)
+df_nre = add_to_df("NRE Cost", Packaging_Cost, df_nre)
+df_nre = add_to_df("NRE Cost", System_Cost, df_nre)
+df_nre = add_to_df("NRE Cost", Total_NRE_Cost, df_nre)
 df_nre.to_csv('figure_source_data/figure_11b.csv', index=False)
 
 import matplotlib.pyplot as plt
