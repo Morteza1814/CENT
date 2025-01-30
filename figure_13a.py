@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 df_processed_results = pd.read_csv('cent_simulation/processed_results.csv')
 
 models = ['Llama2-7B', 'Llama2-13B', 'Llama2-70B']
-phases = ['prefill', 'decoding', 'end2end']
 devices = {
     'Llama2-7B': 8,
     'Llama2-13B': 20,
@@ -32,16 +31,15 @@ if os.path.exists("figure_source_data") == False:
 df_latency_speedup.to_csv('figure_source_data/figure_13a.csv', index=False)
 
 
-context_lengths = models + ['Geomean']
+x_labels = models + ['Geomean']
 speedup_list.append(gmean(speedup_list))
 # Plot
-plt.figure(figsize=(5, 5))
-plt.bar(context_lengths, speedup_list, color='skyblue', edgecolor='black')
+plt.figure(figsize=(6, 5))
+plt.bar(x_labels, speedup_list, color='skyblue', edgecolor='black')
 
 # Labels
 plt.xlabel("End-to-End", fontsize=12)
 plt.ylabel("CENT/GPU Latency Speedup", fontsize=12)
-plt.ylim(0, 6.5)
 
 # Formatting
 plt.xticks(fontsize=12)

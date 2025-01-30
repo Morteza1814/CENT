@@ -2,14 +2,9 @@
 
 This repository provides the following artifact required for the evaluation of the **CENT**, "PIM is All You Need: A CXL-Enabled GPU-Free System for LLM Inference" paper published in ASPLOS 2025:
 
-* Figure 11, cost model python script
-* Figure 12(a~c), simulation
-* Figure 12(d), GPU raw data and simulation
-* Figure 13, GPU raw data and simulation
-* Figure 14(a, c), GPU raw data and simulation
-* Figure 14(b), GPU raw data
-
 ## Directory Structure
+
+TODO
 
 ## Dependencies
 
@@ -23,6 +18,7 @@ Prepare the environment using the following commands:
 conda create -n cent_ae python=3.10
 conda activate cent_ae
 pip install -r requirements.txt
+
 git submodule add https://github.com/arkhadem/ramulator2.git ramulator2
 cd ramulator2
 # only gcc-12 is supported
@@ -34,11 +30,19 @@ cp ./ramulator2 ../ramulator2
 cd ..
 ```
 
+## Artifact Scripts
+
+Remove old results
+```bash
+rm simulation_results.csv
+rm processed_results.csv
+rm figures/*
+rm figure_source_data/*
+```
+
 ### Run Simulation
 ```bash
 cd cent_simulation
-rm simulation_results.csv
-rm processed_results.csv
 bash simulation.sh
 bash process_results.sh
 ```
@@ -57,6 +61,21 @@ python figure_12a.py
 python figure_12b.py
 python figure_12c.py
 python figure_12d.py
+```
+
+### Figure 13
+CENT speedup over GPU baselines. (a) Batch = 1 Latency comparison. (b) Throughput comparison under the highest batch size that CENT and GPU and achieve. (c) TCO normalized throughput comprison.
+```bash
+python figure_13a.py
+python figure_13b.py
+python figure_13c.py
+```
+
+### Figure 14
+Power and energy analysis. (a) Power consumption, (b) GPU SM frequency and board power, and (c) energy efficiency of CENT and GPU for different stages of Llama2 models using the maximum batch size, 512 prefill tokens and 3584 decoding tokens.
+```bash
+python figure_14a.py
+python figure_14c.py
 ```
 
 ## Citation

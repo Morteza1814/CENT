@@ -318,7 +318,7 @@ def process_throughputs(args):
     if os.path.exists(args.processed_result_path):
         results_df = pd.read_csv(args.processed_result_path)
     else:
-        columns = ['Model', 'Device number', 'Seqlen', 'Pipeline parallelism', 'Tensor parallelism', 'Phase', 'Total Latency (s)', 'Throughput (tokens/s)', 'Energy per Token (mJ)']
+        columns = ['Model', 'Device number', 'Seqlen', 'Pipeline parallelism', 'Tensor parallelism', 'Phase', 'Total Latency (s)', 'Throughput (tokens/s)', 'Energy per Token (mJ)', 'Total power (W)']
         results_df = pd.DataFrame(columns=columns)
 
 
@@ -346,6 +346,7 @@ def process_throughputs(args):
             average_throughput = df['Throughput (tokens/s)'].mean()
             average_energy = df['Token energy (mJ)'].mean()
             total_latency = df['Token latency (ms)'].mean() * seqlen / 1000
+            total_power = df['Total power (W)'].mean()
 
             new_result = {
                 'Model': args.model,
@@ -356,7 +357,8 @@ def process_throughputs(args):
                 'Phase': args.phase,
                 'Total Latency (s)': total_latency,
                 'Throughput (tokens/s)': average_throughput,
-                'Energy per Token (mJ)': average_energy
+                'Energy per Token (mJ)': average_energy,
+                'Total power (W)': total_power
             }
             new_result_df = pd.DataFrame([new_result])
             results_df = pd.concat([results_df, new_result_df], ignore_index=True)
@@ -378,6 +380,7 @@ def process_throughputs(args):
         average_throughput = df['Throughput (tokens/s)'].mean()
         average_energy = df['Token energy (mJ)'].mean()
         total_latency = df['Token latency (ms)'].mean() * seqlen / 1000
+        total_power = df['Total power (W)'].mean()
 
         new_result = {
             'Model': args.model,
@@ -388,7 +391,8 @@ def process_throughputs(args):
             'Phase': args.phase,
             'Total Latency (s)': total_latency,
             'Throughput (tokens/s)': average_throughput,
-            'Energy per Token (mJ)': average_energy
+            'Energy per Token (mJ)': average_energy,
+            'Total power (W)': total_power
         }
         new_result_df = pd.DataFrame([new_result])
         results_df = pd.concat([results_df, new_result_df], ignore_index=True)
