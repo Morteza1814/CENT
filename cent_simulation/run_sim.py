@@ -304,7 +304,8 @@ def update_csv(args, seqlen_list):
             results_df = pd.concat([results_df, new_result_df], ignore_index=True)
 
     # Save the DataFrame to a CSV file
-    results_df = results_df.drop_duplicates()
+    results_df = results_df.drop_duplicates(subset=['Model', 'Device number', 'Pipeline parallelism', 'Tensor parallelism', 'Channels per device', 'Channels per block', 'Sequence length'])
+    results_df = results_df.sort_values(by=['Model', 'Device number', 'Pipeline parallelism', 'Tensor parallelism', 'Channels per device', 'Channels per block', 'Sequence length'])
     results_df.to_csv(args.simulation_result_path, index=False)
     # print(results_df)
 
