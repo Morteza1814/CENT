@@ -56,6 +56,12 @@ bash simulation.sh 8 128
 bash process_results.sh
 ```
 
+Generate all figures use the script below or generate them one by one using scripts in sections below
+
+```bash
+bash generate_figures.sh
+```
+
 ### Figure 11
 
 The CXL controller costs are broken down into die, packaging and Non Recurring Engineering (NRE) components. The die cost is derived from the wafer cost, considering the CXL controller die area and yield rate. The cost of 2D packaging is assumed to be 29% of chip cost (die and package). The NRE cost is

@@ -27,7 +27,7 @@ dict_CENT_70B["throughput"].append(df['Throughput (tokens/s)'].mean().item() * 6
 
 font = 20
 dict_GPU_70B = load_QoS_file("data/GPU_70B_4k.csv")
-plt.figure(figsize=(5, 4))
+plt.figure(figsize=(10, 8))
     
 plt.plot(dict_CENT_70B["throughput"], dict_CENT_70B["latency"], marker='s', linestyle='-', color='Red', label="Cellar")
 plt.plot(dict_GPU_70B["throughput"], dict_GPU_70B["latency"], marker='o', linestyle='-', color='Blue', label="GPU")
@@ -35,6 +35,9 @@ plt.plot(dict_GPU_70B["throughput"], dict_GPU_70B["latency"], marker='o', linest
 plt.legend(loc="upper left", fontsize=font)
 plt.tick_params(axis='x', labelsize=font)
 plt.tick_params(axis='y', labelsize=font)
+
+plt.xlabel('Throughput (Query/min)', fontsize=font)
+plt.ylabel('Query Latency (min)', fontsize=font)
 
 if os.path.exists("figures") == False:
     os.mkdir("figures")

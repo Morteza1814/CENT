@@ -41,15 +41,15 @@ df_power.to_csv('figure_source_data/figure_14a.csv', index=False)
 
 x_labels = []
 for model in models:
-    x_labels.append('8 CENT\n' + model + '\nPrefill')
-    x_labels.append('1 A100\n' + model + '\nPrefill')
-    x_labels.append('20 CENT\n' + model + '\nDecoding')
-    x_labels.append('2 A100\n' + model + '\nDecoding')
-    x_labels.append('32 CENT\n' + model + '\nEnd-to-End')
-    x_labels.append('4 A100\n' + model + '\nEnd-to-End')
+    x_labels.append('8 CENT\n' + model.split("-")[-1] + '\nPrefill')
+    x_labels.append('1 A100\n' + model.split("-")[-1] + '\nPrefill')
+    x_labels.append('20 CENT\n' + model.split("-")[-1] + '\nDecoding')
+    x_labels.append('2 A100\n' + model.split("-")[-1] + '\nDecoding')
+    x_labels.append('32 CENT\n' + model.split("-")[-1] + '\nEnd2End')
+    x_labels.append('4 A100\n' + model.split("-")[-1] + '\nEnd2End')
 
 # Plot
-plt.figure(figsize=(15, 5))
+plt.figure(figsize=(20, 8))
 power_list = df_power['Power(W)'].tolist()
 plt.bar(x_labels, power_list, color='orange', edgecolor='black')
 

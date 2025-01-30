@@ -72,7 +72,7 @@ ax.barh(y_pos, CPU_latency, left=np.array(PIM_latency_list) + np.array(CXL_laten
 # Labels & Formatting
 ax.set_yticks(y_pos)
 ax.set_yticklabels(parallel_list, fontsize=12)
-ax.set_xlabel("Query Latency (minute)", fontsize=12, fontweight='bold')
+ax.set_xlabel("Query Latency (minute)", fontsize=12)
 ax.legend(fontsize=10, loc="upper right")
 
 plt.grid(axis="x", linestyle="--", alpha=0.5)

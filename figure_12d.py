@@ -74,7 +74,7 @@ ax.bar(x, decoding, bottom=prefill, color="sandybrown", edgecolor='black', label
 # Labels & Formatting
 ax.set_xticks(x)
 ax.set_xticklabels(x_labels, fontsize=10, rotation=0)
-ax.set_ylabel("Query Latency (minute)", fontsize=12, fontweight='bold')
+ax.set_ylabel("Query Latency (minute)", fontsize=12)
 ax.set_ylim(0, 9)  # Adjust based on data range
 ax.legend(fontsize=10, loc="upper left")
 
