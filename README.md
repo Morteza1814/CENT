@@ -27,7 +27,7 @@ cd ramulator2
 mkdir build
 cd build
 cmake ..
-make -j
+make -j4
 cp ./ramulator2 ../ramulator2
 cd ..
 ```
