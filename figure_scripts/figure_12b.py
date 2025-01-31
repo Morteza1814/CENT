@@ -1,6 +1,8 @@
 import os
+import sys
 import pandas as pd
 import matplotlib.pyplot as plt
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from utils import load_QoS_file
 
 # Load the data

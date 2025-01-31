@@ -1,5 +1,7 @@
 import os
+import sys
 import pandas as pd
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from cost_model.supply_chain_model import mw_mask_costs_arr, mw_ip_costs_arr, mw_backend_labor_cost_per_week, mw_backend_cad_license_per_eng_week, mw_frontend_labor_cost_per_week, mw_flip_chip_bga_package_design_cost, mw_system_NRE_cost
 
 if os.path.exists("figure_source_data") == False:
@@ -66,6 +68,9 @@ ax.set_xticks([])
 ax.set_ylabel("Million Dollar ($)")
 ax.set_xlabel("NRE Cost")
 ax.legend()
+
+if os.path.exists("figures") == False:
+    os.mkdir("figures")
 
 plt.savefig("figures/figure_11b.pdf")
 

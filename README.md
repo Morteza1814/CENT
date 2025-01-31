@@ -12,15 +12,15 @@ Python infrastructure requires `pandas`, `matplotlib`, `torch`, and `scipy` pack
 Clone the repository recursively:
 
 ```bash
-git clone --recursive https://github.com/Yufeng98/CENT_AE.git
-cd CENT_AE
+git clone --recursive https://github.com/Yufeng98/CENT.git
+cd CENT
 ```
 
 Install the Python packages locally or create a conda environment:
 
 ```bash
-conda create -n cent_ae python=3.10 -y
-conda activate cent_ae
+conda create -n cent python=3.10 -y
+conda activate cent
 pip install -r requirements.txt
 ```
 
