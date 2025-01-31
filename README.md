@@ -4,18 +4,19 @@ This repository provides the following artifact required for the evaluation of t
 
 ## Dependencies
 
-AiM Simulator is tested and verified with `g++-12` and `clang++-15`.
+AiM Simulator is tested and verified with `g++-11/12/13` and `clang++-15`.
+Python infrastructure requires `pandas`, `matplotlib`, `torch`, and `scipy` packages.
 
 ## Build
 
-Clone the repository recursively
+Clone the repository recursively:
 
 ```bash
 git clone --recursive https://github.com/Yufeng98/CENT_AE.git
 cd CENT_AE
 ```
 
-Create conda environment
+Install the Python packages locally or create a conda environment:
 
 ```bash
 conda create -n cent_ae python=3.10 -y
@@ -23,7 +24,7 @@ conda activate cent_ae
 pip install -r requirements.txt
 ```
 
-Build AiM simulator
+Build the AiM simulator:
 
 ```bash
 # use g++-11/12/13
@@ -32,22 +33,20 @@ mkdir build
 cd build
 cmake ..
 make -j4
-cp ./ramulator2 ../ramulator2
 cd ../../
 ```
 
 ## Artifact Scripts
 
-Remove old results
+Remove old results:
+
 ```bash
 bash remove_old_results.sh
 ```
 
 ### Run Simulation
 
-Setting `sequence length gap` to 1 will start full simulation, generating token by token from 1 to 4096. Setting `sequence length gap` to 128 will generate tokens at index of 128, 256, ..., 4096. The final results are averaged on various sequence lengths. We show results using `sequence length gap = 1`, but full simulation takes long time and ~100GB disk space. For example, using 8 threads on a desktop takes ~24 hours for full simulation, and using 96 threads on a server takes ~12 hours for full simulation.
-
-For a quick verification, use `sequence length gap = 128`, which only takes a few hours and has minor difference in results.
+Perform the end-to-end trace generation, performance simulation, and power modeling:
 
 ```bash
 cd cent_simulation
@@ -56,7 +55,9 @@ bash simulation.sh 8 128
 bash process_results.sh
 ```
 
-Generate all figures use the script below or generate them one by one using scripts in sections below
+**Note:** Setting `sequence length gap` to 1 will start full simulation, generating token by token from 1 to 4096. Setting `sequence length gap` to 128 will generate tokens at index of 128, 256, ..., 4096. The final results are averaged on various sequence lengths. We show results using `sequence length gap = 1`, but full simulation takes long time and ~100GB disk space. For example, using 8 threads on a desktop takes ~24 hours for full simulation, and using 96 threads on a server takes ~12 hours for full simulation. For a quick verification, use `sequence length gap = 128`, which only takes a few hours and has minor difference in results.
+
+Generate all figures using the following script or generate them one by one using scripts in sections below:
 
 ```bash
 bash generate_figures.sh
@@ -64,8 +65,7 @@ bash generate_figures.sh
 
 ### Figure 11
 
-The CXL controller costs are broken down into die, packaging and Non Recurring Engineering (NRE) components. The die cost is derived from the wafer cost, considering the CXL controller die area and yield rate. The cost of 2D packaging is assumed to be 29% of chip cost (die and package). The NRE cost is
-influenced by chip production volumes.
+The CXL controller costs are broken down into die, packaging and Non Recurring Engineering (NRE) components. The die cost is derived from the wafer cost, considering the CXL controller die area and yield rate. The cost of 2D packaging is assumed to be 29% of chip cost (die and package). The NRE cost is influenced by chip production volumes.
 
 ```bash
 python figure_11.py
