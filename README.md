@@ -64,7 +64,7 @@ Generate all figures using the following script or generate them one by one usin
 bash generate_figures.sh
 ```
 
-After completing this step, CSV and PDF files for Figures 11–14 will be generated in the [figures](/figures/) and [figure_source_data](/figure_source_data/) directories. The figures in the published paper were created using [an Excel file](/cent_simulation/Figures.xlsx) located in the `cent_simulation` directory. 
+After completing this step, CSV and PDF files for Figures 11–14 will be generated in the `figures` and `figure_source_data` directories. The figures in the published paper were created using `cent_simulation/Figures.xlsx` Excel file.
 To reproduce the figures in the same format as those in the paper, copy the content of the generated CSV files into the `Data` sheet of the Excel file. The figures will then be generated in the `Figures` sheet.
 
 ### Figure 11
