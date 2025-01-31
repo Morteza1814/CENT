@@ -28,7 +28,7 @@ Build the AiM simulator:
 
 ```bash
 # use g++-11/12/13
-cd ramulator2
+cd aim_simulator
 mkdir build
 cd build
 cmake ..
