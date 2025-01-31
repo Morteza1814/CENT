@@ -68,7 +68,7 @@ bash generate_figures.sh
 The CXL controller costs are broken down into die, packaging and Non Recurring Engineering (NRE) components. The die cost is derived from the wafer cost, considering the CXL controller die area and yield rate. The cost of 2D packaging is assumed to be 29% of chip cost (die and package). The NRE cost is influenced by chip production volumes.
 
 ```bash
-python figure_11.py
+python figure_scripts/figure_11.py
 ```
 
 ### Figure 12
@@ -76,10 +76,10 @@ python figure_11.py
 Analysis on Llama2-70B. (a) CENT achieves higher decoding throughputs with long context windows and 3.5K decoding sizes. (b) QoS analysis: CENT shows less query latency when achieving the similar to GPUs. (c) CENT latency breakdown with different parallelism strategies. (d) Prefill (In) and decoding (Out) latency comparison with different In/Out sizes, at maximum supported batches for both GPU and CENT.
 
 ```bash
-python figure_12a.py
-python figure_12b.py
-python figure_12c.py
-python figure_12d.py
+python figure_scripts/figure_12a.py
+python figure_scripts/figure_12b.py
+python figure_scripts/figure_12c.py
+python figure_scripts/figure_12d.py
 ```
 
 ### Figure 13
@@ -87,9 +87,9 @@ python figure_12d.py
 CENT speedup over GPU baselines. (a) Batch = 1 Latency comparison. (b) Throughput comparison under the highest batch size that CENT and GPU and achieve. (c) TCO normalized throughput comprison.
 
 ```bash
-python figure_13a.py
-python figure_13b.py
-python figure_13c.py
+python figure_scripts/figure_13a.py
+python figure_scripts/figure_13b.py
+python figure_scripts/figure_13c.py
 ```
 
 ### Figure 14
@@ -97,8 +97,8 @@ python figure_13c.py
 Power and energy analysis. (a) Power consumption, (b) GPU SM frequency and board power, and (c) energy efficiency of CENT and GPU for different stages of Llama2 models using the maximum batch size, 512 prefill tokens and 3584 decoding tokens.
 
 ```bash
-python figure_14a.py
-python figure_14c.py
+python figure_scripts/figure_14a.py
+python figure_scripts/figure_14c.py
 ```
 
 ## Citation
