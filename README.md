@@ -53,6 +53,7 @@ cd cent_simulation
 # bash simulation.sh <set threads based on your platform> <sequence length gap>
 bash simulation.sh 8 128
 bash process_results.sh
+cd ..
 ```
 
 **Note:** Setting `sequence length gap` to 1 will start full simulation, generating token by token from 1 to 4096. Setting `sequence length gap` to 128 will generate tokens at index of 128, 256, ..., 4096. The final results are averaged on various sequence lengths. We show results using `sequence length gap = 1`, but full simulation takes long time and ~100GB disk space. For example, using 8 threads on a desktop takes ~24 hours for full simulation, and using 96 threads on a server takes ~12 hours for full simulation. For a quick verification, use `sequence length gap = 128`, which only takes a few hours and has minor difference in results.
