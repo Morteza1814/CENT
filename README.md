@@ -1,6 +1,6 @@
-# Artifcat of the CENT Paper, ASPLOS 2025
+# Artifact of the CENT Paper, ASPLOS 2025
 
-This repository provides the following artifact required for the evaluation of the **CENT**, "PIM is All You Need: A CXL-Enabled GPU-Free System for LLM Inference" paper published in ASPLOS 2025:
+This repository provides the following artifact required for the evaluation of **CENT**, "PIM is All You Need: A CXL-Enabled GPU-Free System for LLM Inference" paper published in ASPLOS 2025:
 
 ## Dependencies
 
@@ -27,7 +27,7 @@ pip install -r requirements.txt
 Build the AiM simulator:
 
 ```bash
-# use g++-11/12/13
+# use g++-11/12/13. e.g. (export CXX=/usr/bin/g++-12)
 cd aim_simulator
 mkdir build
 cd build
