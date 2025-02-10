@@ -41,7 +41,7 @@ for d in decoding_list:
     df_results = pd.concat([df_results, df_new], ignore_index=True)
 if os.path.exists("figure_source_data") == False:
     os.mkdir("figure_source_data")
-df_results.to_csv('figure_source_data/figure_12d.csv', index=False)
+df_results.to_csv('figure_source_data/figure_14d.csv', index=False)
 
 # Labels for x-axis
 x_labels = [
@@ -85,4 +85,4 @@ plt.grid(axis="y", linestyle="--", alpha=0.5)
 plt.tight_layout()
 if os.path.exists("figures") == False:
     os.mkdir("figures")
-plt.savefig('figures/figure_12d.pdf')
+plt.savefig('figures/figure_14d.pdf')

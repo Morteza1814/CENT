@@ -1,60 +1,36 @@
 import os
 import pandas as pd
-from scipy.stats import gmean
 import matplotlib.pyplot as plt
 
-df_processed_results = pd.read_csv('cent_simulation/processed_results.csv')
+# Load the data
+df_simulation_results = pd.read_csv('cent_simulation/simulation_results.csv')
+gpu_decoding = pd.read_csv('data/GPU_70B_decoding.csv')
 
-models = ['Llama2-7B', 'Llama2-13B', 'Llama2-70B']
-phases = ['prefill', 'decoding', 'end2end']
-tokens = {
-    'prefill': 512,
-    'decoding': 3584,
-    'end2end': 4096,
-}
-transformer_block = {
-    'Llama2-7B': 32,
-    'Llama2-13B': 40,
-    'Llama2-70B': 80,
-}
-seqlen = 4096
+decoding = 3584
+seqlen_list = [4096, 8192, 16384, 32768]
+for i in range(len(seqlen_list)):
+    seqlen_list[i] = (seqlen_list[i] + seqlen_list[i] - 3584) // 2
+cent_throughput_list = []
+gpu_throughput_list = [t for t in gpu_decoding['Throughput (tokens/s)']]
+speedup_list = []
 
+for seqlen in seqlen_list:
+    df = df_simulation_results[(df_simulation_results['Model'] == 'Llama2-70B') & (df_simulation_results['Device number'] == 32) & (df_simulation_results['Sequence length'] == seqlen) & (df_simulation_results['Pipeline parallelism'] == 80) & (df_simulation_results['Tensor parallelism'] == 1)]
+    cent_throughput_list.append(df['Throughput (tokens/s)'].mean().item())
+    speedup_list.append(cent_throughput_list[-1] / gpu_throughput_list[seqlen_list.index(seqlen)])
 
-CENT_power_list = []
-GPU_power_list = []
-df_power = pd.DataFrame(columns=['Model', 'Power(W)'])
-df_GPU_power = pd.read_csv('data/GPU_power.csv')
-for model in models:
-    for phase in phases:
-        GPU_power_list.append(df_GPU_power[(df_GPU_power['Model'] == model)][phase].iloc[0])
-        df = df_processed_results[(df_processed_results['Model'] == model) & (df_processed_results['Seqlen'] == seqlen) & (df_processed_results['Pipeline parallelism'] == transformer_block[model]) & (df_processed_results['Tensor parallelism'] == 1) & (df_processed_results['Phase'] == phase)]
-        CENT_power_list.append(df['Total power (W)'].iloc[0])
-        new_df = pd.DataFrame({'Model': [model], 'Power(W)': [CENT_power_list[-1]]})
-        df_power = pd.concat([df_power, new_df], ignore_index=True)
-    for phase in phases:
-        new_df = pd.DataFrame({'Model': [model], 'Power(W)': df_GPU_power[(df_GPU_power['Model'] == model)][phase].iloc[0]})
-        df_power = pd.concat([df_power, new_df], ignore_index=True)
-if os.path.exists("figure_source_data") == False:
-    os.mkdir("figure_source_data")
-df_power.to_csv('figure_source_data/figure_14a.csv', index=False)
+# print(cent_throughput_list)
+# print(gpu_throughput_list)
 
-
-x_labels = []
-for model in models:
-    x_labels.append('8 CENT\n' + model.split("-")[-1] + '\nPrefill')
-    x_labels.append('1 A100\n' + model.split("-")[-1] + '\nPrefill')
-    x_labels.append('20 CENT\n' + model.split("-")[-1] + '\nDecoding')
-    x_labels.append('2 A100\n' + model.split("-")[-1] + '\nDecoding')
-    x_labels.append('32 CENT\n' + model.split("-")[-1] + '\nEnd2End')
-    x_labels.append('4 A100\n' + model.split("-")[-1] + '\nEnd2End')
-
+context_lengths = ["4K", "8K", "16K", "32K"]
 # Plot
-plt.figure(figsize=(20, 8))
-power_list = df_power['Power(W)'].tolist()
-plt.bar(x_labels, power_list, color='orange', edgecolor='black')
+plt.figure(figsize=(5, 5))
+plt.bar(context_lengths, speedup_list, color='skyblue', edgecolor='black')
 
 # Labels
-plt.ylabel("Power(W)", fontsize=12)
+plt.xlabel("Context Length", fontsize=12)
+plt.ylabel("CENT / GPU Speedup", fontsize=12)
+plt.ylim(0, 4)
 
 # Formatting
 plt.xticks(fontsize=12)
@@ -65,3 +41,15 @@ if os.path.exists("figures") == False:
     os.mkdir("figures")
 plt.savefig('figures/figure_14a.pdf')
 
+df = pd.DataFrame(columns=['CENT/GPU Normalized Throughput'])
+
+for i in range(len(seqlen_list)):
+    new_row = {
+        'CENT/GPU Normalized Throughput': speedup_list[i],
+    }
+    df_new = pd.DataFrame(new_row, index=[0])    
+    df = pd.concat([df, df_new], ignore_index=True)
+
+if os.path.exists("figure_source_data") == False:
+    os.mkdir("figure_source_data")
+df.to_csv('figure_source_data/figure_14a.csv', index=False)

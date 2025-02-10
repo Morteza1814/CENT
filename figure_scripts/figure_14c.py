@@ -1,67 +1,85 @@
 import os
+import sys
+import numpy as np
 import pandas as pd
-from scipy.stats import gmean
 import matplotlib.pyplot as plt
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from cent_simulation.utils import InOut_latency
 
-df_processed_results = pd.read_csv('cent_simulation/processed_results.csv')
+df_simulation_results = pd.read_csv('cent_simulation/simulation_results.csv')
 
-models = ['Llama2-7B', 'Llama2-13B', 'Llama2-70B']
-phases = ['prefill', 'decoding', 'end2end']
-transformer_block = {
-    'Llama2-7B': 32,
-    'Llama2-13B': 40,
-    'Llama2-70B': 80,
-}
+batch = [80, 16, 8, 4, 2, 1]
 seqlen = 4096
+num_devices = 32
+transformer_blocks = 80
 
+parallel_list = ["PP=80", "PP=16 TP=2", "PP=8 TP=4", "PP=4 TP=8", "PP=2 TP=16", "PP=1 TP=32"]
+PIM_latency_list = []
+CXL_latency_list = []
+Acc_latency_list = []
+CPU_latency_list = []
 
-CENT_energy_list = []
-GPU_energy_list = []
-speedup_list = []
-df_energy_speedup = pd.DataFrame(columns=['Model', 'CENT/GPU Normalized Token / J'])
-df_GPU_energy = pd.read_csv('data/GPU_energy.csv')
-for phase in phases:
-    for model in models:
-        GPU_energy_list.append(df_GPU_energy[(df_GPU_energy['Model'] == model)][phase].iloc[0])
-        df = df_processed_results[(df_processed_results['Model'] == model) & (df_processed_results['Seqlen'] == seqlen) & (df_processed_results['Pipeline parallelism'] == transformer_block[model]) & (df_processed_results['Tensor parallelism'] == 1) & (df_processed_results['Phase'] == phase)]
-        CENT_energy_list.append(1000 / df['Energy per Token (mJ)'].iloc[0])
-        speedup_list.append(CENT_energy_list[-1] / GPU_energy_list[-1])
-        new_df = pd.DataFrame({'Model': [model], 'CENT/GPU Normalized Token / J': [speedup_list[-1]]})
-        df_energy_speedup = pd.concat([df_energy_speedup, new_df], ignore_index=True)
-geomean = gmean(speedup_list[-3:])
-new_df = pd.DataFrame({'Model': ['Geomean'], 'CENT/GPU Normalized Token / J': [geomean]})
-df_energy_speedup = pd.concat([df_energy_speedup, new_df], ignore_index=True)
+df = df_simulation_results[(df_simulation_results['Model'] == 'Llama2-70B') & (df_simulation_results['Device number'] == 32) & (df_simulation_results['Pipeline parallelism'] == 80) & (df_simulation_results['Tensor parallelism'] == 1)]
+
+PIM_latency = df['PIM latency'].mean() * transformer_blocks / 1000 / 60 * seqlen
+CXL_latency = df['CXL latency'].mean() * transformer_blocks / 1000 / 60 * seqlen
+Acc_latency = df['Acc latency'].mean() * transformer_blocks / 1000 / 60 * seqlen
+CPU_latency = InOut_latency * seqlen / 1000 / 60
+
+PIM_latency_list.append(PIM_latency)
+CXL_latency_list.append(CXL_latency)
+Acc_latency_list.append(Acc_latency)
+CPU_latency_list.append(CPU_latency)
+
+for pp in batch[1:]:
+
+    tp = num_devices // pp
+    df = df_simulation_results[(df_simulation_results['Model'] == 'Llama2-70B') & (df_simulation_results['Device number'] == 32) & (df_simulation_results['Pipeline parallelism'] == pp) & (df_simulation_results['Tensor parallelism'] == tp)]
+
+    PIM_latency = df['PIM latency'].mean() * transformer_blocks / 1000 / 60 * seqlen
+    CXL_latency = df['CXL latency'].mean() * transformer_blocks / 1000 / 60 * seqlen
+    Acc_latency = df['Acc latency'].mean() * transformer_blocks / 1000 / 60 * seqlen
+    CPU_latency = InOut_latency * seqlen / 1000 / 60
+    
+    PIM_latency_list.append(PIM_latency)
+    CXL_latency_list.append(CXL_latency)
+    Acc_latency_list.append(Acc_latency)
+    CPU_latency_list.append(CPU_latency)
+
+df_results = pd.DataFrame(columns=['PIM Latency (min)', 'CXL Latency (min)', 'Acc Latency (min)', 'CPU Latency (min)'])
+
+for i in range(len(parallel_list)):
+    new_row = {
+        'PIM Latency (min)': PIM_latency_list[i],
+        'CXL Latency (min)': CXL_latency_list[i],
+        'Acc Latency (min)': Acc_latency_list[i],
+        'CPU Latency (min)': CPU_latency_list[i]
+    }
+    df_new = pd.DataFrame(new_row, index=[0])    
+    df_results = pd.concat([df_results, df_new], ignore_index=True)
+
 if os.path.exists("figure_source_data") == False:
     os.mkdir("figure_source_data")
-df_energy_speedup.to_csv('figure_source_data/figure_14c.csv', index=False)
+df_results.to_csv('figure_source_data/figure_14c.csv', index=False)
 
+# Stacked bar chart
+fig, ax = plt.subplots(figsize=(6, 4))
+y_pos = np.arange(len(parallel_list))
 
-x_labels = models * 3 + ['Geomean']
-x_labels[0] = '7B\nPrefill'
-x_labels[1] = '13B\nPrefill'
-x_labels[2] = '70B\nPrefill'
-x_labels[3] = '7B\nDecoding'
-x_labels[4] = '13B\nDecoding'
-x_labels[5] = '70B\nDecoding'
-x_labels[6] = '7B\nEnd-to-End'
-x_labels[7] = '13B\nEnd-to-End'
-x_labels[8] = '70B\nEnd-to-End'
-speedup_list.append(geomean)
-speedup_list = [float(i) for i in speedup_list]
+ax.barh(y_pos, PIM_latency_list, color="navajowhite", edgecolor='black', label="PIM")
+ax.barh(y_pos, CXL_latency_list, left=PIM_latency_list, color="lightblue", edgecolor='black', label="CXL")
+ax.barh(y_pos, Acc_latency_list, left=np.array(PIM_latency_list) + np.array(CXL_latency_list), color="darkgreen", edgecolor='black', label="PNM")
+ax.barh(y_pos, CPU_latency, left=np.array(PIM_latency_list) + np.array(CXL_latency_list) + np.array(Acc_latency_list), color="black", edgecolor='black', label="Host CPU")
 
-# Plot
-plt.figure(figsize=(13, 5))
-plt.bar(x_labels, speedup_list, color='green', edgecolor='black')
+# Labels & Formatting
+ax.set_yticks(y_pos)
+ax.set_yticklabels(parallel_list, fontsize=12)
+ax.set_xlabel("Query Latency (minute)", fontsize=12)
+ax.legend(fontsize=10, loc="upper right")
 
-# Labels
-plt.ylabel("CENT/GPU Normalized Token / J", fontsize=12)
-
-# Formatting
-plt.xticks(fontsize=12)
-plt.yticks(fontsize=12)
-plt.grid(axis='y', linestyle='--', alpha=0.5)
+plt.grid(axis="x", linestyle="--", alpha=0.5)
+plt.tight_layout()
 
 if os.path.exists("figures") == False:
     os.mkdir("figures")
 plt.savefig('figures/figure_14c.pdf')
-

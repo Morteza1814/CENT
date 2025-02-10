@@ -40,7 +40,7 @@ df_nre = add_to_df("NRE Cost", IP_Licensing_Cost, df_nre)
 df_nre = add_to_df("NRE Cost", Packaging_Cost, df_nre)
 df_nre = add_to_df("NRE Cost", System_Cost, df_nre)
 df_nre = add_to_df("NRE Cost", Total_NRE_Cost, df_nre)
-df_nre.to_csv('figure_source_data/figure_11b.csv', index=False)
+df_nre.to_csv('figure_source_data/figure_12b.csv', index=False)
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -72,7 +72,7 @@ ax.legend()
 if os.path.exists("figures") == False:
     os.mkdir("figures")
 
-plt.savefig("figures/figure_11b.pdf")
+plt.savefig("figures/figure_12b.pdf")
 
 from cost_model.supply_chain_model import wafer_costs_arr, defect_density_vector_mm2, yield_rate, num_wafers_needed
 
@@ -113,7 +113,7 @@ for i in range(len(production_volume)):
     }
     df_new = pd.DataFrame(new_row, index=[0])    
     df_cost = pd.concat([df_cost, df_new], ignore_index=True)
-df_cost.to_csv('figure_source_data/figure_11a.csv', index=False)
+df_cost.to_csv('figure_source_data/figure_12a.csv', index=False)
 
 # Stacked bar chart
 fig, ax = plt.subplots(figsize=(5, 4))
@@ -137,5 +137,5 @@ ax.legend(loc="upper right")
 
 if os.path.exists("figures") == False:
     os.mkdir("figures")
-plt.savefig("figures/figure_11a.pdf")
+plt.savefig("figures/figure_12a.pdf")
 

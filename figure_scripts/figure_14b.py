@@ -43,7 +43,7 @@ plt.ylabel('Query Latency (min)', fontsize=font)
 
 if os.path.exists("figures") == False:
     os.mkdir("figures")
-plt.savefig('figures/figure_12b.pdf')
+plt.savefig('figures/figure_14b.pdf')
 
 # print(dict_CENT_70B["latency"])
 # print(dict_CENT_70B["throughput"])
@@ -70,4 +70,4 @@ for i in range(len(dict_GPU_70B['latency'])):
 
 if os.path.exists("figure_source_data") == False:
     os.mkdir("figure_source_data")
-df.to_csv('figure_source_data/figure_12b.csv', index=False)
+df.to_csv('figure_source_data/figure_14b.csv', index=False)
