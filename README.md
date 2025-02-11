@@ -1,6 +1,6 @@
 # Artifact of the CENT Paper, ASPLOS 2025
 
-This repository provides the following artifact required for the evaluation of **CENT**, "PIM is All You Need: A CXL-Enabled GPU-Free System for LLM Inference" paper published in ASPLOS 2025:
+This repository provides the following artifact required for the evaluation of **CENT**, "PIM is All You Need: A CXL-Enabled GPU-Free System for LLM Inference" paper published in ASPLOS 2025.
 
 ## Dependencies
 
@@ -67,23 +67,12 @@ bash generate_figures.sh
 After completing this step, CSV and PDF files for Figures 11–14 will be generated in the `figures` and `figure_source_data` directories. The figures in the published paper were created using `cent_simulation/Figures.xlsx` Excel file.
 To reproduce the figures in the same format as those in the paper, copy the content of the generated CSV files into the `Data` sheet of the Excel file. The figures will then be generated in the `Figures` sheet.
 
-### Figure 11
+### Figure 12
 
 The CXL controller costs are broken down into die, packaging and Non Recurring Engineering (NRE) components. The die cost is derived from the wafer cost, considering the CXL controller die area and yield rate. The cost of 2D packaging is assumed to be 29% of chip cost (die and package). The NRE cost is influenced by chip production volumes.
 
 ```bash
-python figure_scripts/figure_11.py
-```
-
-### Figure 12
-
-Analysis on Llama2-70B. (a) CENT achieves higher decoding throughputs with long context windows and 3.5K decoding sizes. (b) QoS analysis: CENT shows less query latency when achieving the similar to GPUs. (c) CENT latency breakdown with different parallelism strategies. (d) Prefill (In) and decoding (Out) latency comparison with different In/Out sizes, at maximum supported batches for both GPU and CENT.
-
-```bash
-python figure_scripts/figure_12a.py
-python figure_scripts/figure_12b.py
-python figure_scripts/figure_12c.py
-python figure_scripts/figure_12d.py
+python figure_scripts/figure_12.py
 ```
 
 ### Figure 13
@@ -98,11 +87,22 @@ python figure_scripts/figure_13c.py
 
 ### Figure 14
 
-Power and energy analysis. (a) Power consumption, (b) GPU SM frequency and board power, and (c) energy efficiency of CENT and GPU for different stages of Llama2 models using the maximum batch size, 512 prefill tokens and 3584 decoding tokens.
+Analysis on Llama2-70B. (a) CENT achieves higher decoding throughputs with long context windows and 3.5K decoding sizes. (b) QoS analysis: CENT shows less query latency when achieving the similar to GPUs. (c) CENT latency breakdown with different parallelism strategies. (d) Prefill (In) and decoding (Out) latency comparison with different In/Out sizes, at maximum supported batches for both GPU and CENT.
 
 ```bash
 python figure_scripts/figure_14a.py
+python figure_scripts/figure_14b.py
 python figure_scripts/figure_14c.py
+python figure_scripts/figure_14d.py
+```
+
+### Figure 15
+
+Power and energy analysis. (a) Power consumption, (b) GPU SM frequency and board power, and (c) energy efficiency of CENT and GPU for different stages of Llama2 models using the maximum batch size, 512 prefill tokens and 3584 decoding tokens.
+
+```bash
+python figure_scripts/figure_15a.py
+python figure_scripts/figure_15c.py
 ```
 
 ## Citation
