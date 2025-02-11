@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..', 'simulator_python')))
 
 from cxl_latency import llama_latency, gpt_latency, vector_latency
-from cellar_power_calculator import DRAM_POWER, ACCEL_CYCLE, ACCEL_POWER, SRAM_POWER, CTRL_POWER, commands, isrs, power_calculator, command_processor
+from cent_power_calculator import DRAM_POWER, ACCEL_CYCLE, ACCEL_POWER, SRAM_POWER, CTRL_POWER, commands, isrs, power_calculator, command_processor
 
 def get_args():
     parser = argparse.ArgumentParser('run_scripts.py')

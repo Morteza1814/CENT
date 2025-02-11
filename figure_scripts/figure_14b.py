@@ -31,7 +31,7 @@ font = 20
 dict_GPU_70B = load_QoS_file("data/GPU_70B_4k.csv")
 plt.figure(figsize=(10, 8))
     
-plt.plot(dict_CENT_70B["throughput"], dict_CENT_70B["latency"], marker='s', linestyle='-', color='Red', label="Cellar")
+plt.plot(dict_CENT_70B["throughput"], dict_CENT_70B["latency"], marker='s', linestyle='-', color='Red', label="CENT")
 plt.plot(dict_GPU_70B["throughput"], dict_GPU_70B["latency"], marker='o', linestyle='-', color='Blue', label="GPU")
 
 plt.legend(loc="upper left", fontsize=font)

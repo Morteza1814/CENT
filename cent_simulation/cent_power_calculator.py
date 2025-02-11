@@ -79,11 +79,13 @@ DRAM_POWER = {  "ACT_STBY": 527.5 / 2.00, # 415,
 # STT: Static
 # Power in mW
 # TODO: Change SFT
-ACCEL_POWER = { "RED": {"SWITCH": 8.01e-03, "INT": 1.017, "LEAK": 3.34e+04},
-                "EXP": {"SWITCH": 3.41e-02, "INT": 3.231, "LEAK": 7.99e+04},
-                "VEC": {"SWITCH": 1.44e-02, "INT": 1.070, "LEAK": 4.31e+04},
-                "CTR": {"SWITCH": 9.00e-03 + 1.65e-02 + 1.40e-02 + 0.283 + 6.26e-04, "INT": 0.216 + 1.157 + 0.220 + 32.535 + 4.28e-02, "LEAK": 2.03e+03 + 9.01e+03 + 1.82e+03 + 2.54e+05 + 540.653},
-                "RV": 41}
+ACCEL_POWER = { "RED": {"SWITCH": 5.62E-02, "INT": 2.32E-01, "LEAK": 5.62E+03},
+                "EXP": {"SWITCH": 3.39E-02, "INT": 5.60E-01, "LEAK": 1.28E+04},
+                "VEC": {"SWITCH": 1.33E-01, "INT": 2.48E-01, "LEAK": 6.54E+03},
+                "CTR": {"SWITCH": 3.18E-03 + 3.36E-03 + 2.89E-03 + 2.37E-01 + 1.30E-04, 
+                        "INT": 2.49E-02 + 2.37E-01 + 4.51E-02 + 5.42E+00 + 8.77E-03, 
+                        "LEAK": 2.87E+02 + 1.48E+03 + 2.94E+02 + 4.36E+04 + 8.78E+01},
+                "RV": 3.96}   # 1 RV core
 for accel_name in ["RED", "EXP", "VEC", "CTR"]:
     ACCEL_POWER[accel_name]["DYN"] = float(ACCEL_POWER[accel_name]["SWITCH"] + ACCEL_POWER[accel_name]["INT"])
     ACCEL_POWER[accel_name]["STT"] = float(ACCEL_POWER[accel_name]["LEAK"]) / float(GIGA)
@@ -251,7 +253,7 @@ def power_calculator(stat, PCIE_bits, Head, HiddenDim, Tokens, GQA):
     return energy, latency
 
 def get_args():
-    parser = argparse.ArgumentParser(description="Cellar Power Calculator")
+    parser = argparse.ArgumentParser(description="CENT Power Calculator")
     parser.add_argument("--mlog", help="path of the main ramulator log", type=str, required=True)
     parser.add_argument("--plog", help="path of the pim ramulator log (only if ch_per_bl > ch_per_dv)", type=str)
     parser.add_argument("--head", help="Number of heads", type=int, required=True)
