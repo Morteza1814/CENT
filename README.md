@@ -2,6 +2,10 @@
 
 This repository provides the following artifact required for the evaluation of **CENT**, "PIM is All You Need: A CXL-Enabled GPU-Free System for LLM Inference" paper published in ASPLOS 2025.
 
+<p align="center">
+<img src="CENT.png" alt="CENT" width="80%">
+</p>
+
 ## Dependencies
 
 AiM Simulator is tested and verified with `g++-11/12/13` and `clang++-15`.
