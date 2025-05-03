@@ -60,6 +60,7 @@ def get_args():
     parser.add_argument("--FC-devices", type=int, help="devices utilized for FC layer in model parallel")
     parser.add_argument("--seqlen", type=int, help="specify seqlen for only trace mode", default=4096)
     parser.add_argument("--trace-file", help="Name of generated trace file", default="null.log")
+    parser.add_argument("--inter-device-attention", action="store_true")
     args = parser.parse_args()
     return args
 

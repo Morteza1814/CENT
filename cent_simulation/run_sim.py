@@ -30,6 +30,7 @@ def get_args():
     parser.add_argument("--seqlen", type=int, nargs='+', help="Sequence list")
     parser.add_argument("--seqlen_gap", type=int, help="Gap between sequence lengths", default=128)
     parser.add_argument("--model_parallel", action="store_true", help="Apply model parallelism")
+    parser.add_argument("--inter-device-attention", action="store_true")
     args = parser.parse_args()
     return args
 
@@ -70,10 +71,12 @@ def generate_trace(args, seqlen_list):
             commands_generate_traces.append(["python3", "function_sim.py", model, "--n_heads", str(n_heads[args.model]), "--ffn_dim", str(ffn_size[args.model]), "--embedding", "--only-trace", "--num-channels", str(args.num_channels), "--channels-per-block", str(channels_per_block), "--pipeline-parallel", "--multi-tb-per-device", "--seqlen", str(seqlen), "--op-trace", "--GEMV", "reuse-GB", "--reuse-size", str(args.reuse_size), "--trace-file", f"../trace/{args.num_channels}_channels_per_device/pipeline_parallel_embedding/{args.model}/trace_{channels_per_block}_channels_per_block_seqlen_{seqlen}.txt"])
 
     for seqlen in seqlen_list:
-        if args.model_parallel:
+        if args.model_parallel:          
             for FC_devices in FC_devices_list:
                 if not os.path.exists(f"../trace/{args.num_channels}_channels_per_device/model_parallel/{args.model}/trace_{FC_devices}_FC_devices_seqlen_{seqlen}.txt"):
                     commands_generate_traces.append(["python3", "function_sim.py", model, "--n_heads", str(n_heads[args.model]), "--ffn_dim", str(ffn_size[args.model]), "--only-trace", "--num-channels", str(args.num_channels), "--FC-devices", str(FC_devices), "--model-parallel", "--seqlen", str(seqlen), "--op-trace", "--GEMV", "reuse-GB", "--reuse-size", str(args.reuse_size), "--trace-file", f"../trace/{args.num_channels}_channels_per_device/model_parallel/{args.model}/trace_{FC_devices}_FC_devices_seqlen_{seqlen}.txt"])
+                    if args.inter_device_attention:
+                        commands_generate_traces[-1].append("--inter-device-attention")
                 if not os.path.exists(f"../trace/{args.num_channels}_channels_per_device/model_parallel_FC/{args.model}/trace_{FC_devices}_FC_devices_seqlen_{seqlen}.txt"):
                     commands_generate_traces.append(["python3", "function_sim.py", model, "--n_heads", str(n_heads[args.model]), "--ffn_dim", str(ffn_size[args.model]), "--only-FC", "--only-trace", "--num-channels", str(args.num_channels), "--FC-devices", str(FC_devices), "--model-parallel", "--seqlen", str(seqlen), "--op-trace", "--GEMV", "reuse-GB", "--reuse-size", str(args.reuse_size), "--trace-file", f"../trace/{args.num_channels}_channels_per_device/model_parallel_FC/{args.model}/trace_{FC_devices}_FC_devices_seqlen_{seqlen}.txt"])
         else:
