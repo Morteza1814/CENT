@@ -4,19 +4,18 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # ─────────────── USER SETTINGS ─────────────── #
-prefill_sizes       = [256, 512, 1024]          # try any list you like
-requested_decodes   = [128, 512, 1024, 3584]    # original wish-list
-context_len         = 4096                      # hard limit
-transformer_blocks  = 80
-src_csv             = "simulation_results.csv"
+prefill_sizes       = [32, 128, 512, 2048, 3584, 3968, 4064]
+context_len         = 4096             
+transformer_blocks  = 32
+src_csv             = "simulation_results_7B_32sqgap.csv"
 # out_data_csv        = "figure_source_data/figure_14d_cent_only.csv"
-out_fig_pdf         = "figures/figure_14d_cent_only.pdf"
+out_fig_pdf         = "7B_d32_tp1_pp32.pdf"
 # ───────────────────────────────────────────── #
 
 # CENT simulation results
 df = pd.read_csv(src_csv)
 df = df[
-    (df["Model"] == "Llama2-70B") &
+    (df["Model"] == "Llama2-7B") &
     (df["Device number"] == 32) &
     (df["Pipeline parallelism"] == transformer_blocks) &
     (df["Tensor parallelism"] == 1)
@@ -25,44 +24,64 @@ df = df[
 records, prefill_vals, decoding_vals, x_labels = [], [], [], []
 
 for prefill in prefill_sizes:
+    max_decode = max(context_len - prefill, 0)
+    decode_sizes = []
+
+    # Start with 32 and multiply by 2 until >= max_decode
+    d = 32
+    while d < max_decode:
+        decode_sizes.append(d)
+        d *= 4
+    if max_decode > 0:
+        decode_sizes.append(max_decode)  # include final decode (possibly not power of two)
+
+    decode_sizes = list(dict.fromkeys(decode_sizes))  # remove duplicates
+
     # average token latency for sequences ≤ prefill
     prefill_latency = (
         df[df["Sequence length"] <= prefill]["Token latency (ms)"].mean()
         * prefill / 1000 / 60
     )
 
-    seen_decode_sizes = set()  # avoid duplicates per‐prefill
+    prefill_latency_ms  = (
+        df[df["Sequence length"] <= prefill]["Token latency (ms)"].mean()
+        * prefill
+    )
 
-    for req_d in requested_decodes:
-        # Adjust decoding size to honour context_len
-        eff_d = min(req_d, max(context_len - prefill, 0))
-
-        # Skip if no room or we already plotted this eff_d for this prefill
-        if eff_d == 0 or eff_d in seen_decode_sizes:
-            continue
-        seen_decode_sizes.add(eff_d)
-
+    for dec in decode_sizes:
         dec_latency = (
             df[(df["Sequence length"] > prefill) &
-               (df["Sequence length"] <= prefill + eff_d)]["Token latency (ms)"].mean()
-            * eff_d / 1000 / 60
+               (df["Sequence length"] <= prefill + dec)]["Token latency (ms)"].mean()
+            * dec / 1000 / 60
+        )
+
+        dec_latency_ms = (
+            df[(df["Sequence length"] > prefill) &
+               (df["Sequence length"] <= prefill + dec)]["Token latency (ms)"].mean()
+            * dec
         )
 
         prefill_vals.append(prefill_latency)
         decoding_vals.append(dec_latency)
-        x_labels.append(f"{prefill}_{eff_d}")
+        x_labels.append(f"{prefill}_{dec}")
 
         records.append({
             "Prefill size": prefill,
-            "Decoding tokens": eff_d,
-            "Prefill latency (min)": prefill_latency,
-            "Decoding latency (min)": dec_latency,
+            "Decoding tokens": dec,
+            "Prefill latency (min)": prefill_latency_ms,
+            "Decoding latency (min)": dec_latency_ms,
         })
 
-# ───────────── save raw numbers ───────────── #
-# os.makedirs("figure_source_data", exist_ok=True)
-# pd.DataFrame(records).to_csv(out_data_csv, index=False)
 
+# ───────────── save raw numbers ───────────── #
+# Derive “figure_14d_cent_only.csv” from “figure_14d_cent_only.pdf”
+out_data_csv = os.path.splitext(out_fig_pdf)[0] + ".csv"
+csv_dir      = os.path.dirname(out_data_csv)
+# only create a directory if one is actually present in the path
+if csv_dir:                       # '' means “current directory” → nothing to create
+    os.makedirs(csv_dir, exist_ok=True)
+
+pd.DataFrame(records).to_csv(out_data_csv, index=False)
 # ─────────────────── PLOT ─────────────────── #
 x = np.arange(len(x_labels))
 prefill_arr  = np.array(prefill_vals)
